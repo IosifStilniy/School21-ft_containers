@@ -1,23 +1,31 @@
 #include <iostream>
 #include <vector>
+#include <map>
 #include <list>
 #include <forward_list>
 #include <deque>
 #include <memory>
 #include <thread>
 #include <iterator>
+#include <string>
 
-class Kaka
-{
-	public:
-		Kaka() { std::cout << "Kaka" << std::endl; };
-};
-
+template <typename T>
 class Popa
 {
 	private:
-		Kaka	k;
+		T	k;
+
+
 	public:
+
+		template <typename U>
+		class Kaka
+		{
+			public:
+				T	a;
+				U	b;
+		};
+
 		Popa() { std::cout << "cnstr" << std::endl; };
 		Popa(const Popa & src) { std::cout << "copy cnstr" << std::endl; };
 		~Popa() { std::cout << "destr" << std::endl; };
@@ -25,22 +33,33 @@ class Popa
 
 int main(void)
 {
+	std::vector<int>	a;
+
+	a.push_back(1);
+	a.push_back(2);
+	a.push_back(3);
+	a.push_back(4);
+	// Popa<int>::Kaka<char>	a;
+
+	// a.a = 5;
+	// a.b = 'a';
+	// std::cout << a.a << " " << a.b << std::endl;
 	// Popa	a;
 	// std::vector<Popa>(10);
-	std::vector<int>			a;
-	std::list<int>		b;
+	// std::vector<int>			a;
+	// std::list<int>		b;
 
-	for (int i = 0; i < 10; i++)
-	{
-		b.push_back(i);
-		a.push_back(i);
-	}
+	// for (int i = 0; i < 10; i++)
+	// {
+	// 	b.push_back(i);
+	// 	a.push_back(i);
+	// }
 
 	// std::reverse_iterator<std::list<int>::iterator>	aa(b.end());
 	// std::reverse_iterator<std::list<int>::iterator>	bb(b.begin());
-	std::reverse_iterator<std::vector<int>::iterator>	aa(a.end());
-	std::reverse_iterator<std::vector<int>::iterator>	bb(a.begin());
-	std::cout << (aa > bb) << std::endl;
+	// std::reverse_iterator<std::vector<int>::iterator>	aa(a.end());
+	// std::reverse_iterator<std::vector<int>::iterator>	bb(a.begin());
+	// std::cout << (aa > bb) << std::endl;
 	// std::reverse_iterator<std::vector<int>::iterator>	cc;
 	
 	// std::cout << *aa << std::endl;

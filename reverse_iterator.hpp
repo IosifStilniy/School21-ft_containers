@@ -99,7 +99,7 @@ namespace ft
 			reference	operator[](difference_type n)	const
 			{
 				return (*(*this + n));
-			}
+			};
 
 			pointer	operator->(void)	const
 			{
@@ -116,8 +116,8 @@ namespace ft
 	};
 
 	template <class Iterator>
-	typename reverse_iterator<Iterator>
-		operator+(reverse_iterator<Iterator>::difference_type n, const reverse_iterator<Iterator> & rhd)
+	typename ft::reverse_iterator<Iterator>
+		operator+(typename ft::reverse_iterator<Iterator>::difference_type n, const ft::reverse_iterator<Iterator> & rhd)
 	{
 		return (reverse_iterator<Iterator>(rhd.base() - n));
 	};
