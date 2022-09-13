@@ -5,38 +5,110 @@
 # include "iterator.hpp"
 # include "iterator_traits.hpp"
 # include "reverse_iterator.hpp"
+
 #include <vector>
 std::vector<int> a;
+
 namespace ft
 {
 	template <typename T, class Alloc = std::allocator<T> >
 	class vector
 	{
 		private:
+
 			T *	_values;
 
 			template <typename pointer>
-			class _iterator : public ft::iterator<ft::random_access_iterator_tag, T>
+			class _iterator : public ft::iterator<ft::random_access_iterator_tag, pointer>
 			{
 				private:
-					pointer	current;
+					pointer	_current;
 
 				public:
-					_iterator(/* args */);
+					_iterator(void) {};
+
+					_iterator(const _iterator & src)
+					{
+						*this = src;
+					};
+
+					_iterator(const pointer & src) : _current(src) {};
+
 					~_iterator();
+
+					_iterator &	operator=(const _iterator & rhd)
+					{
+						this->_current = rhd._current;
+						return (*this);
+					};
 
 					reference	operator*(void)	const
 					{
-						return (*current);
+						return (*_current);
 					};
 
 					pointer	operator->(void)	const
 					{
-						return (current);
+						return (_current);
+					};
+
+					reference	operator[](difference_type n)	const
+					{
+						return (this->_current[n]);
+					};
+
+					_iterator	operator+(difference_type n)	const
+					{
+						return (_iterator(this->_current + n));
+					};
+
+					_iterator &	operator+=(difference_type n)
+					{
+						this->_current += n;
+						return (*this);
+					};
+
+					_iterator &	operator++(void)
+					{
+						this->_current++;
+						return (*this);
+					};
+
+					_iterator	operator++(int)
+					{
+						return (_iterator(this->_current++));
+					};
+
+					_iterator	operator-(difference_type n)	const
+					{
+						return (_iterator(this->_current - n));
+					};
+
+					_iterator &	operator-=(difference_type n)
+					{
+						this->_current -= n;
+						return (*this);
+					};
+
+					_iterator &	operator--(void)
+					{
+						this->_current--;
+						return (*this);
+					};
+
+					_iterator	operator--(int)
+					{
+						return (_iterator(this->_current--));
+					};
+
+					const pointer &	base(void)	const
+					{
+						return (this->_current);
 					};
 			};
 
 		public:
+
 			typedef				T													value_type;
 			typedef				Alloc												allocator_type;
 			typedef typename	allocator_type::reference							reference;
@@ -73,5 +145,6 @@ namespace ft
 			vector(const Vector & src);
 			~vector();
 	};
-}
+};
+
 #endif
