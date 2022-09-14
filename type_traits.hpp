@@ -1,5 +1,5 @@
-#ifndef ENABLE_IF_HPP
-# define ENABLE_IF_HPP
+#ifndef TYPE_TRAITS_HPP
+# define TYPE_TRAITS_HPP
 
 namespace	ft
 {
@@ -102,7 +102,7 @@ namespace	ft
 	struct _is_integral_helper<unsigned long long int> : public true_type {};
 
 	template <typename T>
-	struct is_integral : public _is_integral_helper< _remove_cv<T>::type >::type {};
+	struct is_integral : public _is_integral_helper< typename _remove_cv<T>::type >::type {};
 };
 
 #endif

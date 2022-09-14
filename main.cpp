@@ -9,6 +9,8 @@
 #include <iterator>
 #include <string>
 #include <type_traits>
+#include <stdexcept>
+#include <typeinfo>
 #include "type_traits.hpp"
 
 template <typename T>
@@ -31,6 +33,11 @@ class Popa
 		Popa() { std::cout << "cnstr" << std::endl; };
 		Popa(const Popa & src) { std::cout << "copy cnstr" << std::endl; };
 		~Popa() { std::cout << "destr" << std::endl; };
+
+		void puk()
+		{
+			std::cout << "puk" << std::endl;
+		};
 };
 
 template <typename T>
@@ -49,10 +56,55 @@ int main(void)
 {
 	// const int		*i;
 	// const int		*j;
+	// std::vector<int>	a(2);
+	std::vector<int>	b(3);
+	// std::vector<Popa<int> >	a;
+	// Popa<int> ** 	p;
+	// Popa<int>		ref;
 
+	std::cout << "do" << std::endl;
+	b.resize(2);
+	std::cout << "posle" << std::endl;
+	// a = b;
+	// b[0] = 1;
+	// b[1] = 2;
+	std::vector<int>::iterator	c = b.begin() + 1;
+	std::cout << c.base() << std::endl;
+	// std::cout << std::boolalpha << (typeid(std::vector<int>::iterator::pointer) == typeid(int *)) << std::endl;
+	// std::cout << &(*c) << std::endl;
+	// std::vector<int>::iterator	d = b.insert(c, 1);
+	// std::cout << *c << std::endl;
+	// std::cout << *++c << std::endl;
+	// std::cout << *d << std::endl;
+	// p = std::allocator<Popa<int> * >().allocate(1);
+	// std::allocator<Popa<int> * >().construct(p);
+	// std::allocator<Popa<int> >().construct(p, ref);
+	// std::allocator<Popa<int> >().construct(p, ref);
+	// p->puk();
+	// std::allocator<Popa<int> * >().deallocate(p, -1);
+	// std::cout << "asdasd" << std::endl;
+	// a.resize(1);
+	// std::vector<int>::iterator b = a.end();
+	// std::cout << &(*a.begin()) << std::endl;
+	// std::cout << &(*b) << std::endl;
+	// a.push_back(2);
+	// std::cout << &(*b) << std::endl;
+	// std::cout << *b << std::endl;
+	// std::cout << a.size() << std::endl;
+	// a.assign(b.begin(), b.end());
+	// std::cout << a.size() << std::endl;
+	// a[0] = 5;
+	// a[4] = 5;
+	// a.resize(1, 100);
+	// std::cout << a.at(4) << std::endl;
+	
+	// b = a;
+	// std::cout << b[4] << std::endl;
+	// b.resize(5);
+	// std::cout << b[4] << std::endl;
 	// std::is_integral
-	std::cout << ft::integral_constant<int, 10>::value << std::endl;
-	std::cout << ft::integral_constant<int, 10>() << std::endl;
+	// std::cout << ft::integral_constant<int, 10>::value << std::endl;
+	// std::cout << ft::integral_constant<int, 10>() << std::endl;
 
 	// i = &std::integral_constant<int, 5>::value;
 	// std::cout << *i << std::endl;
