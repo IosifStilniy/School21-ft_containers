@@ -1,17 +1,18 @@
 #include <iostream>
-#include <vector>
-#include <map>
-#include <list>
-#include <forward_list>
-#include <deque>
-#include <memory>
-#include <thread>
-#include <iterator>
-#include <string>
-#include <type_traits>
-#include <stdexcept>
-#include <typeinfo>
-#include "type_traits.hpp"
+// #include <vector>
+// #include <map>
+// #include <list>
+// #include <forward_list>
+// #include <deque>
+// #include <memory>
+// #include <thread>
+// #include <iterator>
+// #include <string>
+// #include <type_traits>
+// #include <stdexcept>
+// #include <typeinfo>
+// #include "type_traits.hpp"
+#include "vector.hpp"
 
 template <typename T>
 class Popa
@@ -32,19 +33,26 @@ class Popa
 
 		Popa() { std::cout << "cnstr" << std::endl; };
 		Popa(const Popa & src) { std::cout << "copy cnstr" << std::endl; };
+		Popa(T k) : k(k) {};
 		~Popa() { std::cout << "destr" << std::endl; };
 
 		void puk()
 		{
 			std::cout << "puk" << std::endl;
 		};
+
+		void puk(Popa & src)
+		{
+			this->k = src.k;
+			std::cout << "puk " << this->k << std::endl;
+		};
 };
 
-template <typename T>
-typename ft::enable_if<std::is_integral<T>::value, bool>::type	is_odd(T i)
-{
-	return (i % 2);
-};
+// template <typename T>
+// typename ft::enable_if<std::is_integral<T>::value, bool>::type	is_odd(T i)
+// {
+// 	return (i % 2);
+// };
 
 // template <typename T, typename = typename ft::enable_if<std::is_integral<T>::value>::type >
 // bool	is_even(T i)
@@ -56,20 +64,39 @@ int main(void)
 {
 	// const int		*i;
 	// const int		*j;
-	// std::vector<int>	a(2);
-	std::vector<int>	b(3);
-	// std::vector<Popa<int> >	a;
+	// std::vector<int>	a(5);
+	// std::vector<int>	b(3);
+	ft::vector<Popa<int> >	a(2);
+	// ft::vector<int>	a(2);
 	// Popa<int> ** 	p;
-	// Popa<int>		ref;
+	// Popa<int>		ref(2);
+	// Popa<int>		reff(3);
 
-	std::cout << "do" << std::endl;
-	b.resize(2);
-	std::cout << "posle" << std::endl;
+
+	// std::cout << "tuta" << std::endl;
+	// a.insert(a.begin() + 1, a[0]);
+	// std::cout << "tama" << std::endl;
+
+	// ref.puk(reff);
+	// for (int i = 0; i < 5; i++)
+	// 	a[i] = i + 1;
+
+	// for (int i = 0; i < 3; i++)
+	// 	b[i] = (i + 1) * 10;
+
+	// std::cout << &a[0] << std::endl;
+	// a.swap(b);
+	// std::cout << &b[0] << std::endl;
+
+	// std::cout << a.capacity() << " " << b.capacity() << std::endl;
+	// std::cout << "do" << std::endl;
+	// b.resize(2);
+	// std::cout << "posle" << std::endl;
 	// a = b;
 	// b[0] = 1;
 	// b[1] = 2;
-	std::vector<int>::iterator	c = b.begin() + 1;
-	std::cout << c.base() << std::endl;
+	// std::vector<int>::iterator	c = b.begin() + 1;
+	// std::cout << c.base() << std::endl;
 	// std::cout << std::boolalpha << (typeid(std::vector<int>::iterator::pointer) == typeid(int *)) << std::endl;
 	// std::cout << &(*c) << std::endl;
 	// std::vector<int>::iterator	d = b.insert(c, 1);

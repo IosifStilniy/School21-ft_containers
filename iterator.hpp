@@ -12,14 +12,14 @@ namespace ft
 
 namespace ft
 {
-	template<class Category, class T, class Distance = ptrdiff_t, class Pointer = T*, class Reference = T& >
+	template <class Category, class T, class Distance = ptrdiff_t, class Pointer = T*, class Reference = T& >
 	struct iterator
 	{
-		typedef typename	Category	iterator_category;
-		typedef typename	T			value_type;
-		typedef typename	Distance	difference_type;
-		typedef typename	Pointer		pointer;
-		typedef typename	Reference	reference;
+		typedef Category	iterator_category;
+		typedef T			value_type;
+		typedef Distance	difference_type;
+		typedef Pointer		pointer;
+		typedef Reference	reference;
 	};
 };
 

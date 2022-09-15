@@ -6,30 +6,28 @@
 # include "iterator.hpp"
 # include "iterator_traits.hpp"
 # include "reverse_iterator.hpp"
-
-#include <vector>
-std::vector<int> a;
+# include "algorithm.hpp"
 
 namespace ft
 {
 	template <typename T, class Alloc = std::allocator<T> >
 	class vector
 	{
-		public:
-
-			typedef	typename	T													value_type;
-			typedef				Alloc												allocator_type;
-			typedef typename	allocator_type::reference							reference;
-			typedef typename	allocator_type::const_reference						const_reference;
-			typedef typename	allocator_type::pointer								pointer;
-			typedef typename	allocator_type::const_pointer						const_pointer;
-			typedef typename	allocator_type::size_type							size_type;
-
 		private:
 
-			template <typename pointer>
-			class _iterator : public ft::iterator<ft::random_access_iterator_tag, pointer>
+			template <typename Iterator>
+			class _iterator
 			{
+				private:
+					typedef				ft::iterator_traits<Iterator>		_traits_type;
+
+				public:
+					typedef	typename	_traits_type::iterator_category		iterator_category;
+					typedef	typename	_traits_type::value_type			value_type;
+					typedef	typename	_traits_type::difference_type		difference_type;
+					typedef	typename	_traits_type::reference				reference;
+					typedef	typename	_traits_type::pointer				pointer;
+
 				private:
 					pointer	_current;
 
@@ -148,11 +146,19 @@ namespace ft
 
 		public:
 
+			typedef				T													value_type;
+			typedef				Alloc												allocator_type;
+			typedef typename	allocator_type::reference							reference;
+			typedef typename	allocator_type::const_reference						const_reference;
+			typedef typename	allocator_type::pointer								pointer;
+			typedef typename	allocator_type::const_pointer						const_pointer;
+			typedef typename	allocator_type::size_type							size_type;
+
 			typedef  			_iterator<pointer>									iterator;
 			typedef  			_iterator<const_pointer>							const_iterator;
 			typedef typename	ft::iterator_traits<iterator>::difference_type		difference_type;
-			typedef 			reverse_iterator<iterator>							reverse_iterator;
 			typedef				reverse_iterator<const_iterator>					const_reverse_iterator;
+			typedef 			reverse_iterator<iterator>							reverse_iterator;
 
 		private:
 
@@ -199,7 +205,7 @@ namespace ft
 				std::copy(first, last, this->begin());
 			};
 
-			vector(const Vector & src)
+			vector(const vector & src)
 			{
 				*this = src;
 			};
@@ -207,7 +213,7 @@ namespace ft
 			~vector()
 			{
 				for (size_type i = 0; i < this->capacity(); i++)
-					_allocator.destroy(this->_values[i]);
+					_allocator.destroy(this->_values + i);
 
 				_allocator.deallocate(this->_values, this->_capacity);
 			};
@@ -492,8 +498,8 @@ namespace ft
 			template <typename InputIterator>
 			void	insert(iterator position, InputIterator first, InputIterator last)
 			{
-				size_type		indx = position.base() - this->_values;
-				size_type		n = std::distance(first, last);
+				size_type	indx = position.base() - this->_values;
+				size_type	n = std::distance(first, last);
 
 				this->reserve(this->_size + n);
 
@@ -514,6 +520,99 @@ namespace ft
 
 				return (iterator(this->_values + indx));
 			};
+
+			iterator	erase(iterator position)
+			{
+				this->erase(position, position + 1);
+			};
+
+			iterator	erase(iterator first, iterator last)
+			{
+				size_type	src_indx = last.base() - this->_values;
+				size_type	dst_indx = first.base() - this->_values;
+
+				for (size_type i = src_indx; i < this->_size; i++)
+				{
+					_allocator.destroy(this->_values + dst_indx + i);
+					_allocator.construct(this->_values + dst_indx + i, this->_values[src_indx + i]);
+				}
+
+				this->_size -= src_indx - dst_indx;
+				for (size_type i = 0; i < src_indx - dst_indx; i++)
+					_allocator.destroy(this->_values + this->_size + i);
+				
+				return (last);
+			};
+
+			void	swap(vector & src)
+			{
+				value_type *	buf = src->_values;
+				size_type		size_buf = src->_size;
+				size_type		capacity_buf = src->_capacity;
+
+				src->_values = this->_values;
+				src->_size = this->_size;
+				src->_capacity = this->_capacity;
+				this->_values = buf;
+				this->_size = size_buf;
+				this->_capacity = capacity_buf;
+			};
+
+			void	clear(void)
+			{
+				for (size_type i = 0; i < this->_size; i++)
+					_allocator.destroy(this->_values + i);
+				this->_size = 0;
+			};
+
+			allocator_type	get_allocator(void)	const
+			{
+				return (_allocator);
+			};
+	};
+
+	template <typename T, typename Alloc>
+	void	swap(vector<T, Alloc> & lhd, vector<T, Alloc> & rhd)
+	{
+		lhd.swap(rhd);
+	};
+
+	template <typename T, typename Alloc>
+	bool	operator==(vector<T, Alloc> & lhd, vector<T, Alloc> & rhd)
+	{
+		if (lhd.size() != rhd.size())
+			return (false);
+		return (ft::equal(lhd.begin(), lhd.end(), rhd.begin()));
+	};
+
+	template <typename T, typename Alloc>
+	bool	operator!=(vector<T, Alloc> & lhd, vector<T, Alloc> & rhd)
+	{
+		return !(lhd == rhd);
+	};
+
+	template <typename T, typename Alloc>
+	bool	operator<(vector<T, Alloc> & lhd, vector<T, Alloc> & rhd)
+	{
+		return (ft::lexicographical_compare(lhd.begin(), lhd.end(), rhd.begin(), rhd.end()));
+	};
+
+	template <typename T, typename Alloc>
+	bool	operator>(vector<T, Alloc> & lhd, vector<T, Alloc> & rhd)
+	{
+		return (rhd < lhd);
+	};
+
+	template <typename T, typename Alloc>
+	bool	operator<=(vector<T, Alloc> & lhd, vector<T, Alloc> & rhd)
+	{
+		return !(rhd > lhd);
+	};
+
+	template <typename T, typename Alloc>
+	bool	operator>=(vector<T, Alloc> & lhd, vector<T, Alloc> & rhd)
+	{
+		return !(lhd > rhd);
 	};
 };
 

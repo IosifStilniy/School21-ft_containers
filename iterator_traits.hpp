@@ -17,24 +17,24 @@ namespace ft
 		typedef typename	Iterator::iterator_category		iterator_category;
 	};
 
-	template <class T>
+	template <typename T>
 	struct iterator_traits <T *>
 	{
-		typedef typename	ptrdiff_t						difference_type;
-		typedef typename	T								value_type;
-		typedef typename	T *								pointer;
-		typedef typename	T &								reference;
-		typedef typename	ft::random_access_iterator_tag	iterator_category;
+		typedef				ptrdiff_t						difference_type;
+		typedef				T								value_type;
+		typedef				T *								pointer;
+		typedef				T &								reference;
+		typedef 			ft::random_access_iterator_tag	iterator_category;
 	};
 
-	template <class T>
+	template <typename T>
 	struct iterator_traits <const T *>
 	{
-		typedef typename	ptrdiff_t						difference_type;
+		typedef 			ptrdiff_t						difference_type;
 		typedef				T								value_type;
 		typedef				const T *						pointer;
 		typedef				const T &						reference;
-		typedef typename	ft::random_access_iterator_tag	iterator_category;
+		typedef				ft::random_access_iterator_tag	iterator_category;
 	};
 };
 
