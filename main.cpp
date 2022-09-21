@@ -1,5 +1,5 @@
 #include <iostream>
-// #include <vector>
+#include <vector>
 // #include <map>
 // #include <list>
 // #include <forward_list>
@@ -22,7 +22,6 @@ class Popa
 
 
 	public:
-
 		template <typename U>
 		class Kaka
 		{
@@ -32,9 +31,22 @@ class Popa
 		};
 
 		Popa() { std::cout << "cnstr" << std::endl; };
-		Popa(const Popa & src) { std::cout << "copy cnstr" << std::endl; };
+		Popa(const Popa & src) : k(src.k) { std::cout << "copy cnstr" << std::endl; };
 		Popa(T k) : k(k) {};
 		~Popa() { std::cout << "destr" << std::endl; };
+
+		Popa &	operator=(const T & rhd)
+		{
+			this->k = rhd;
+			return (*this);
+		}
+
+		Popa &	operator=(const Popa & rhd)
+		{
+			std::cout << "ass" << std::endl;
+			this->k = rhd.k;
+			return (*this);
+		}
 
 		void puk()
 		{
@@ -46,7 +58,19 @@ class Popa
 			this->k = src.k;
 			std::cout << "puk " << this->k << std::endl;
 		};
+
+		const T & getT(void)	const
+		{
+			return (this->k);
+		};
 };
+
+template <typename T>
+std::ostream & operator<<(std::ostream & out, const Popa<T> & rhd)
+{
+	out << rhd.getT();
+	return (out);
+}
 
 // template <typename T>
 // typename ft::enable_if<std::is_integral<T>::value, bool>::type	is_odd(T i)
@@ -60,19 +84,65 @@ class Popa
 // 	return !(i % 2);
 // }
 
+template <typename T>
+class myAlloc : public std::allocator<T> {
+	public:
+		myAlloc(): aaaa(0) {};
+		myAlloc(const myAlloc & src): aaaa(0) {};
+		myAlloc(int a) : aaaa(a) {};
+
+		int aaaa;
+};
+
 int main(void)
 {
 	// const int		*i;
 	// const int		*j;
-	// std::vector<int>	a(5);
-	// std::vector<int>	b(3);
-	ft::vector<Popa<int> >	a(2);
+	// std::vector<int>	a;
+	// myAlloc<int>					aaa(3);
+	// myAlloc<int>					vvv(aaa);
+	// std::vector<int, myAlloc<int> >	b(3);
+	// std::vector<int, myAlloc<int> >	bb(6);
+	// std::swap<int>(b, bb);
+	// std::vector<int, myAlloc<int> >::iterator		itb = b.begin();
+	// std::vector<int, myAlloc<int> >::const_iterator	itbc = b.begin();
+	// *itb = b.end() - itbc;
+	// ft::vector<Popa<int> >	a(2);
+	// ft::vector<Popa<int> >	b(2);
+	// std::cout << *(a.begin()) << std::endl;
+	// ft::vector<Popa<int> >::iterator	it = a.begin();
+
+	std::vector<Popa<int> >	a(3);
+	// std::vector<Popa<int> >	a;
+	// ft::vector<Popa<int> >	a(3);
+	// ft::vector<Popa<int> >	a;
+	// std::cout << a[0] << std::endl;
+	// a.resize(5);
+	// a.reserve(10);
+	std::cout << "------------" << std::endl;
+
+	std::cout << a.size() << " " << a.capacity() << std::endl;
+	// a.insert(a.begin() + 2, 2, Popa<int>(10));
+	a.insert(a.begin() + 2, Popa<int>(1));
+	std::cout << a.size() << " " << a.capacity() << std::endl;
+
+	// std::cout << (a.begin() == a.end()) << std::endl;
+	// for (; it != a.end(); it++)
+	// 	*it = a.end() - it;
+	
+	// ft::reverse_iterator<ft::vector<Popa<int> >::iterator>	rit(a.end());
+	// ft::reverse_iterator<ft::vector<Popa<int> >::iterator>	rite(a.begin());
+
+	// for (; rit != rite; rit++)
+	// 	std::cout << *rit << std::endl;
+	
+	// a.reserve(10);
 	// ft::vector<int>	a(2);
 	// Popa<int> ** 	p;
 	// Popa<int>		ref(2);
 	// Popa<int>		reff(3);
 
-
+	// std::cout << b.get_allocator().aaaa << std::endl;
 	// std::cout << "tuta" << std::endl;
 	// a.insert(a.begin() + 1, a[0]);
 	// std::cout << "tama" << std::endl;
@@ -192,4 +262,5 @@ int main(void)
 	// std::cout << &(*bb) << std::endl;
 	// std::cout << &(*bb.base()) << std::endl;
 	// std::cout << "asd" << std::endl;
+	std::cout << "------------" << std::endl;
 }
