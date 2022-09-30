@@ -3,8 +3,8 @@
 
 # include <memory>
 # include <stdexcept>
-# include "iterator.hpp"
 # include "iterator_traits.hpp"
+# include "type_traits.hpp"
 # include "reverse_iterator.hpp"
 # include "algorithm.hpp"
 # include "vector_iterator.hpp"
@@ -56,9 +56,34 @@ namespace ft
 				this->_capacity = new_capacity;
 			};
 
+			iterator	_insertion_routine(iterator position, size_type val_num)
+			{
+				size_type	indx = position.base() - this->_values;
+
+				if (this->_size + val_num > this->_capacity * 2)
+					this->reserve(this->_size + val_num);
+				else if (this->_capacity < this->_size + val_num)
+					this->reserve(this->_capacity * 2);
+
+				position = this->begin() + indx;
+
+				iterator	last = this->end() + val_num;
+
+				while (--last > this->end())
+					this->_allocator.construct(last.base(), *(last - val_num));
+				this->_allocator.construct(last.base(), *(last - val_num));
+
+				while (--last > position + val_num - 1)
+					*last = *(last - val_num);
+
+				this->_size += val_num;
+
+				return (position);
+			}
+
 		public:
 
-			explicit	vector(const allocator_type & alloc = allocator_type()) : _values(nullptr), _allocator(alloc) {};
+			explicit	vector(const allocator_type & alloc = allocator_type()) : _values(nullptr), _size(0), _capacity(0), _allocator(alloc) {};
 
 			explicit	vector(size_type n, const value_type & val = value_type(),
 				const allocator_type & alloc = allocator_type()) : _size(n), _capacity(n)
@@ -292,57 +317,52 @@ namespace ft
 			template <typename InputIterator>
 			void	assign(InputIterator first, InputIterator last)
 			{
-				this->reserve(std::distance(first, last));
-				this->_size = std::distance(first, last);
-				for (size_type i = 0; first != last; i++)
-				{
-					_allocator.destroy(this->_values + i);
-					_allocator.construct(this->_values + i, *first);
-					first++;
-				}
+				size_type	n = std::distance(first, last);
+				this->reserve(n);
+
+				iterator	start = this->begin();
+
+				for (;first != last; first++)
+					*(start++) = *first;
+				
+				for (; start != this->end(); start++)
+					this->_allocator.destroy(start.base());
+				
+				this->_size = n;
 			};
 
-			void	assign(size_type n, const value_type & val)
+			void	assign(size_type n, const_reference val)
 			{
 				this->reserve(n);
-				for (this->_size = 0; this->_size < n; this->_size++)
-				{
-					_allocator.destroy(this->_values + this->_size);
-					_allocator.construct(this->_values + this->_size, val);
-				}
+
+				iterator start = this->begin();
+
+				for (size_type i = 0; i < n; i++)
+					*(start++) = val;
+				
+				for (; start != this->end(); start++)
+					this->_allocator.destroy(start.base());
+
+				this->_size = n;
 			};
 
 			void	push_back(const_reference val)
 			{
 				if (this->_size == this->_capacity)
 					this->reserve(this->_size * 2);
-				this->_size++;
-				allocator_type().construct(this->_values + this->_size - 1, val);
+				this->_allocator.construct(this->_values + this->_size++, val);
 			};
 
 			void	pop_back(void)
 			{
 				if (!this->_size)
 					return ;
-				_allocator.destroy(this->_values + --this->_size);
+				this->_allocator.destroy(this->_values + --this->_size);
 			};
 
 			iterator	insert(iterator position, const_reference val)
 			{
-				size_type	indx = position.base() - this->_values;
-
-				if (this->_size == this->_capacity)
-					this->reserve(this->_size * 2);
-
-				position = this->begin() + indx;
-
-				iterator	last = this->end();
-				
-				_allocator.construct(last.base(), *(last - 1));
-				while (--last > position)
-					*last = *(last - 1);
-
-				++this->_size;
+				position = this->_insertion_routine(position, 1);
 
 				*position = val;
 
@@ -351,75 +371,40 @@ namespace ft
 
 			void	insert(iterator position, size_type n, const_reference val)
 			{
-				size_type		indx = position.base() - this->_values;
+				position = this->_insertion_routine(position, n);
 
-				if (this->_size + n > this->_capacity * 2)
-					this->reserve(this->_size + n);
-				else if (this->_capacity < this->_size + n)
-					this->reserve(this->_capacity * 2);
-
-				this->_size += n;
-
-				for (size_type i = indx + n; i < this->_size; i++)
-				{
-					_allocator.destroy(this->_values + i);
-					_allocator.construct(this->_values + i, this->_values[i - 1]);
-				}
-
-				for (; n > 0; --n)
-				{
-					_allocator.destroy(this->_values + indx + n);
-					_allocator.construct(this->_values + indx + n, val);
-				}
-				_allocator.destroy(this->_values + indx + n);
-				_allocator.construct(this->_values + indx + n, val);
+				while (n--)
+					*(position++) = val;
 			};
 
 			template <typename InputIterator>
 			void	insert(iterator position, InputIterator first, InputIterator last)
 			{
-				size_type	indx = position.base() - this->_values;
-				size_type	n = std::distance(first, last);
+				position = this->_insertion_routine(position, std::distance(first, last));
 
-				this->reserve(this->_size + n);
-
-				this->_size += n;
-
-				for (size_type i = indx + n; i < this->_size; i++)
-				{
-					_allocator.destroy(this->_values + i);
-					_allocator.construct(this->_values + i, this->_values[i - 1]);
-				}
-				
-				for (size_type i = indx; first != last; i++)
-				{
-					_allocator.destroy(this->_values + i);
-					_allocator.construct(this->_values + i, *first);
-					first++;
-				}
+				while (first++ != last)
+					*(position++) = *first;
 			};
 
 			iterator	erase(iterator position)
 			{
-				this->erase(position, position + 1);
+				return(this->erase(position, position + 1));
 			};
 
 			iterator	erase(iterator first, iterator last)
 			{
-				size_type	src_indx = last.base() - this->_values;
-				size_type	dst_indx = first.base() - this->_values;
+				iterator	edge = first;
+				size_type	n = last - first;
 
-				for (size_type i = src_indx; i < this->_size; i++)
-				{
-					_allocator.destroy(this->_values + dst_indx + i);
-					_allocator.construct(this->_values + dst_indx + i, this->_values[src_indx + i]);
-				}
-
-				this->_size -= src_indx - dst_indx;
-				for (size_type i = 0; i < src_indx - dst_indx; i++)
-					_allocator.destroy(this->_values + this->_size + i);
+				while (last != this->end())
+					*(first++) = *(last++);
 				
-				return (last);
+				for (; first != this->end(); first++)
+					this->_allocator.destroy(first.base());
+
+				this->_size -= n;
+
+				return (edge);
 			};
 
 			void	swap(vector & src)
@@ -438,8 +423,8 @@ namespace ft
 
 			void	clear(void)
 			{
-				for (size_type i = 0; i < this->_size; i++)
-					_allocator.destroy(this->_values + i);
+				for (iterator start = this->begin(); start != this->end(); start++)
+					_allocator.destroy(start.base());
 				this->_size = 0;
 			};
 

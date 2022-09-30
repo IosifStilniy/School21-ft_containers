@@ -177,7 +177,7 @@ namespace ft
 	template <typename Iter>
 	typename _iterator<Iter>::difference_type	operator-(_iterator<Iter> const & lhd, _iterator<Iter> const & rhd)
 	{
-		return (rhd.base() - lhd.base());
+		return (lhd.base() - rhd.base());
 	}
 
 	template <typename Iter>

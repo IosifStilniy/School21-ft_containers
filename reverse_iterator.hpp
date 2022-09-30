@@ -6,7 +6,7 @@
 namespace ft
 {
 	template <typename Iterator>
-	class reverse_iterator : public ft::iterator <
+	class reverse_iterator : public std::iterator <
 		typename ft::iterator_traits<Iterator>::iterator_category,
 		typename ft::iterator_traits<Iterator>::value_type,
 		typename ft::iterator_traits<Iterator>::difference_type,
