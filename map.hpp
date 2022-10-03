@@ -57,6 +57,7 @@ namespace ft
 		private:
 			allocator_type		_allocator;
 			value_compare		_comparator;
+			RedBlackTree		_tree;
 
 		public:
 
@@ -84,6 +85,7 @@ namespace ft
 			{
 				this->_allocator = rhd._allocator;
 				this->_comparator = rhd._comparator;
+				this->_tree = rhd._tree;
 
 				return (*this);
 			};
