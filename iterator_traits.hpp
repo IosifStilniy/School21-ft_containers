@@ -3,8 +3,6 @@
 
 namespace ft
 {
-	typedef	long	ptrdiff_t;
-
 	template <class Iterator>
 	struct iterator_traits
 	{

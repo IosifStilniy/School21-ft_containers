@@ -55,9 +55,9 @@ namespace ft
 			};
 
 		private:
-			allocator_type		_allocator;
-			value_compare		_comparator;
-			RedBlackTree		_tree;
+			allocator_type													_allocator;
+			value_compare													_comparator;
+			RedBlackTree <value_type, value_compare, allocator_type>		_tree;
 
 		public:
 
