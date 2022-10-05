@@ -14,6 +14,7 @@ namespace ft
 			typedef typename	std::bidirectional_iterator_tag		iterator_category;
 
 			Node *	current;
+			Node *	root;
 
 		private:
 			void	_go(bool forward)
@@ -33,7 +34,7 @@ namespace ft
 					if (!this->current)
 						return ;
 
-					while (this->current->getDir() == forward)
+					while (this->current->parent && this->current->getDir() == forward)
 						this->current = this->current->parent;
 					this->current = this->current->parent;
 				}
@@ -86,13 +87,21 @@ namespace ft
 			};
 
 		public:
-			explicit tree_iterator(Node * node) : current(node) {};
-			explicit tree_iterator(const tree_iterator & it) : current(it.current) {};
+			explicit tree_iterator(Node * node) : current(node)
+			{
+				while (node->parent)
+					node = node->parent;
+				this->root = node;
+			};
+
+			explicit tree_iterator(const tree_iterator & it) : current(it.current), root(it.root) {};
+
 			~tree_iterator() {};
 
 			tree_iterator &	operator=(const tree_iterator & rhd)
 			{
 				this->current = rhd.current;
+				this->root = rhd.root;
 			};
 
 			reference	operator*(void)	const
@@ -130,7 +139,13 @@ namespace ft
 			tree_iterator	operator--(void)
 			{
 				if (!this->current)
+				{
+					this->current = this->root;
+					while (this->current->right)
+						this->current = this->current->right;
+					
 					return (tree_iterator(this->current));
+				}
 
 				this->_go(false);
 

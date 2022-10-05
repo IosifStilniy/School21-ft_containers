@@ -139,22 +139,22 @@ namespace ft
 					_allocator.construct(this->_values + i, value_type());
 			};
 
-			reference	operator[](size_type n)
+			inline reference	operator[](size_type n)
 			{
 				return (this->_values[n]);
 			};
 
-			const_reference	operator[](size_type n)	const
+			inline const_reference	operator[](size_type n)	const
 			{
 				return (this->_values[n]);
 			};
 
-			iterator	begin(void)
+			inline iterator	begin(void)
 			{
 				return (iterator(this->_values));
 			};
 
-			const_iterator	begin(void)	const
+			inline const_iterator	begin(void)	const
 			{
 				return (const_iterator(this->_values));
 			};
@@ -175,27 +175,27 @@ namespace ft
 				return (const_iterator(this->_values + this->_size));
 			};
 
-			reverse_iterator	rbegin(void)
+			inline reverse_iterator	rbegin(void)
 			{
 				return (reverse_iterator(this->end()));
 			};
 
-			const_reverse_iterator	rbegin(void)	const
+			inline const_reverse_iterator	rbegin(void)	const
 			{
 				return (const_reverse_iterator(this->end()));
 			};
 
-			reverse_iterator	rend(void)
+			inline reverse_iterator	rend(void)
 			{
 				return (reverse_iterator(this->begin()));
 			};
 
-			const_reverse_iterator	rend(void)	const
+			inline const_reverse_iterator	rend(void)	const
 			{
 				return (const_reverse_iterator(this->begin()));
 			};
 
-			const_iterator	cbegin(void)	const
+			inline const_iterator	cbegin(void)	const
 			{
 				return (const_iterator(this->_values));
 			};
@@ -208,22 +208,22 @@ namespace ft
 				return (const_iterator(this->_values + this->_size));
 			};
 
-			const_reverse_iterator	crbegin(void)	const
+			inline const_reverse_iterator	crbegin(void)	const
 			{
 				return (const_reverse_iterator(this->end()));
 			};
 
-			const_reverse_iterator	crend(void)	const
+			inline const_reverse_iterator	crend(void)	const
 			{
 				return (const_reverse_iterator(this->begin()));
 			};
 
-			size_type	size(void)	const
+			inline size_type	size(void)	const
 			{
 				return (this->_size);
 			};
 
-			size_type	max_size(void)	const
+			inline size_type	max_size(void)	const
 			{
 				return (_allocator.max_size());
 			};
@@ -244,12 +244,12 @@ namespace ft
 					_allocator.construct(this->_values + this->_size++, val);
 			};
 
-			size_type	capacity(void)	const
+			inline size_type	capacity(void)	const
 			{
 				return (this->_capacity);
 			};
 
-			bool	empty(void)	const
+			inline bool	empty(void)	const
 			{
 				return (!this->_size);
 			};
@@ -284,32 +284,32 @@ namespace ft
 				return (this->_values[n]);
 			};
 
-			reference	front(void)
+			inline reference	front(void)
 			{
 				return (*this->_values);
 			};
 
-			const_reference	front(void)	const
+			inline const_reference	front(void)	const
 			{
 				return (*this->_values);
 			};
 
-			reference	back(void)
+			inline reference	back(void)
 			{
 				return (this->_values[this->_size - 1]);
 			};
 
-			const_reference	back(void)	const
+			inline const_reference	back(void)	const
 			{
 				return (this->_values[this->_size - 1]);
 			};
 
-			value_type *	data(void)
+			inline value_type *	data(void)
 			{
 				return (this->_values);
 			};
 
-			const value_type *	data(void)	const
+			inline const value_type *	data(void)	const
 			{
 				return (this->_values);
 			};
@@ -386,7 +386,7 @@ namespace ft
 					*(position++) = *first;
 			};
 
-			iterator	erase(iterator position)
+			inline iterator	erase(iterator position)
 			{
 				return(this->erase(position, position + 1));
 			};
@@ -428,14 +428,14 @@ namespace ft
 				this->_size = 0;
 			};
 
-			allocator_type	get_allocator(void)	const
+			inline allocator_type	get_allocator(void)	const
 			{
 				return (_allocator);
 			};
 	};
 
 	template <typename T, typename Alloc>
-	void	swap(vector<T, Alloc> & lhd, vector<T, Alloc> & rhd)
+	inline void	swap(vector<T, Alloc> & lhd, vector<T, Alloc> & rhd)
 	{
 		lhd.swap(rhd);
 	};
@@ -449,31 +449,31 @@ namespace ft
 	};
 
 	template <typename T, typename Alloc>
-	bool	operator!=(vector<T, Alloc> & lhd, vector<T, Alloc> & rhd)
+	inline bool	operator!=(vector<T, Alloc> & lhd, vector<T, Alloc> & rhd)
 	{
 		return !(lhd == rhd);
 	};
 
 	template <typename T, typename Alloc>
-	bool	operator<(vector<T, Alloc> & lhd, vector<T, Alloc> & rhd)
+	inline bool	operator<(vector<T, Alloc> & lhd, vector<T, Alloc> & rhd)
 	{
 		return (ft::lexicographical_compare(lhd.begin(), lhd.end(), rhd.begin(), rhd.end()));
 	};
 
 	template <typename T, typename Alloc>
-	bool	operator>(vector<T, Alloc> & lhd, vector<T, Alloc> & rhd)
+	inline bool	operator>(vector<T, Alloc> & lhd, vector<T, Alloc> & rhd)
 	{
 		return (rhd < lhd);
 	};
 
 	template <typename T, typename Alloc>
-	bool	operator<=(vector<T, Alloc> & lhd, vector<T, Alloc> & rhd)
+	inline bool	operator<=(vector<T, Alloc> & lhd, vector<T, Alloc> & rhd)
 	{
 		return !(rhd > lhd);
 	};
 
 	template <typename T, typename Alloc>
-	bool	operator>=(vector<T, Alloc> & lhd, vector<T, Alloc> & rhd)
+	inline bool	operator>=(vector<T, Alloc> & lhd, vector<T, Alloc> & rhd)
 	{
 		return !(lhd > rhd);
 	};
