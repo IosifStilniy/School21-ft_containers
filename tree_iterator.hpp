@@ -10,7 +10,7 @@ namespace ft
 			typedef				ptrdiff_t							difference_type;
 			typedef				T									value_type;
 			typedef				T *									pointer;
-			typedef typename	T &									reference;
+			typedef 			T &									reference;
 			typedef typename	std::bidirectional_iterator_tag		iterator_category;
 
 			Node *	current;

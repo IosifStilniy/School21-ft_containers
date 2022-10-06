@@ -1,6 +1,8 @@
 #ifndef TREE_NODE
 # define TREE_NODE
 
+# include <stdexcept>
+
 namespace ft
 {
 	template <typename T>
@@ -36,7 +38,7 @@ namespace ft
 			TreeNode *	getUncle(void)	const
 			{
 				if (!this->parent || !this->parent->parent)
-					throw std::exception("node have no ancestors");
+					throw std::range_error("node have no ancestors");
 				
 				return (*this->parent->parent->dirs[this->parent->getDir()]);
 			};
@@ -44,7 +46,7 @@ namespace ft
 			bool	isOuterGrandchild(void)	const
 			{
 				if (!this->parent || !this->parent->parent)
-					throw std::exception("node have no ancestors");
+					throw std::range_error("node have no ancestors");
 				
 				for (int i = 0; i < 2; i++)
 					if (*this->parent->parent->dirs[i] == this->parent && *this->parent->dirs[i] == this)
@@ -56,7 +58,7 @@ namespace ft
 			int	getDir(void)	const
 			{
 				if (!this->parent)
-					throw std::exception("node have no parent");
+					throw std::range_error("node have no parent");
 				
 				if (*this->parent->dirs[0] == this)
 					return (0);
@@ -66,7 +68,7 @@ namespace ft
 			void	getOnSurface(void)
 			{
 				if (!this->parent)
-					throw std::exception("node have no parent");
+					throw std::range_error("node have no parent");
 
 				int		i = this->getDir();
 
@@ -109,7 +111,7 @@ namespace ft
 			TreeNode *	getChild(void)	const
 			{
 				if (this->left && this->right)
-					throw std::exception("node have both childs");
+					throw std::range_error("node have both childs");
 				
 				if (this->left)
 					return (this->left);
@@ -119,7 +121,7 @@ namespace ft
 			TreeNode *	getSibling(void)	const
 			{
 				if (!this->parent)
-					throw std::exception("node dosn't have a parent and have no siblings");
+					throw std::range_error("node dosn't have a parent and have no siblings");
 				
 				return (*this->parent->dirs[!this->getDir()]);
 			};

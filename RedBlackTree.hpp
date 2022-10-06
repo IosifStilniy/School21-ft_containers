@@ -1,6 +1,8 @@
 #ifndef REDBLACKTREE_HPP
 # define REDBLACKTREE_HPP
 
+# include <stdexcept>
+# include <memory>
 # include "pair.hpp"
 # include "tree_iterator.hpp"
 # include "tree_node.hpp"
@@ -10,11 +12,11 @@ namespace ft
 	template <typename T, typename Comparator, typename Alloc>
 	class RedBlackTree
 	{
-		private:
+		public:
 			typedef typename	ft::TreeNode<T>										Node;
 
 		public:
-			typedef				Alloc												allocator_type;
+			typedef typename	Alloc::template rebind<Node>::other					allocator_type;
 			typedef typename	allocator_type::size_type							size_type;
 			typedef typename	ft::tree_iterator<T, Node >							iterator;
 			typedef typename	ft::tree_iterator<const T, Node >					const_iterator;
@@ -29,11 +31,13 @@ namespace ft
 			Comparator			comparator;
 			size_type			size;
 
+		public:
+
 			explicit RedBlackTree(allocator_type const & alloc = allocator_type(), Comparator const & comparator = Comparator())
-				: root(nullptr), allocator(alloc), comparator(comparator), size(0) {};
+				: root(nullptr), allocator(allocator_type(alloc)), comparator(Comparator(comparator)), size(0) {};
 
 			explicit RedBlackTree(const T & val, allocator_type const & alloc = allocator_type(), Comparator const & comparator = Comparator())
-				: root(this->allocator.allocate(1)), allocator(alloc), comparator(comparator), size(0)
+				: root(this->allocator.allocate(1)), allocator(allocator_type(alloc)), comparator(Comparator(comparator)), size(0)
 			{
 				this->allocator.construct(this->root, Node(val, false));
 				size++;
@@ -49,19 +53,19 @@ namespace ft
 				this->clear();
 				this->size = src.size;
 
-				_copy(src.root, this->root);
+				this->_copy(src.root, this->root);
 			};
 
 		private:
 
-			static void	_copy(const Node * src, Node ** dst, Node * parent = nullptr)
+			void	_copy(const Node * src, Node ** dst, Node * parent = nullptr)
 			{
 				*dst = this->allocator.allocate(1);
 				this->allocator.construct(*dst, *src);
 				if (src->left)
-					_copy(src->left, &(*dst)->left, *dst);
+					this->_copy(src->left, &(*dst)->left, *dst);
 				if (src->right)
-					_copy(src->left, &(*dst)->right, *dst);
+					this->_copy(src->left, &(*dst)->right, *dst);
 			};
 
 			void	_updateRoot(void)
@@ -70,7 +74,7 @@ namespace ft
 					this->root = this->root->parent;				
 			};
 
-			void	_insertionRebalance(Node * start)
+			static void	_insertionRebalance(Node * start)
 			{
 				Node *	uncle = start->getUncle();
 
@@ -102,11 +106,11 @@ namespace ft
 					start->parent->red = false;
 					uncle->red = false;
 					start->parent->parent->red = true;
-					this->_insertionRebalance(start->parent->parent);
+					_insertionRebalance(start->parent->parent);
 				}
 			};
 
-			void	_deletionBlackSiblingBlackChildRebalance(Node * start, Node * sibling)
+			static void	_deletionBlackSiblingBlackChildRebalance(Node * start, Node * sibling)
 			{
 				if (sibling)
 					sibling->red = true;
@@ -116,22 +120,22 @@ namespace ft
 				if (start->parent->red)
 					start->parent->red = false;
 				else
-					this->_deletionRebalance(start->parent);
+					_deletionRebalance(start->parent);
 			}
 
-			void	_deletionRedSiblingRebalance(Node * start, Node * sibling)
+			static void	_deletionRedSiblingRebalance(Node * start, Node * sibling)
 			{
 				sibling->getOnSurface();
 				sibling->red = false;
 
 				if (start->parent->red)
-					throw std::exception("parent must be black");
+					throw std::logic_error("parent must be black");
 				
 				if (*start->parent->dirs[!start->getDir()])
 					(*start->parent->dirs[!start->getDir()])->red = true;
 			}
 
-			void	_deletionBlackSiblingRedChildRebalance(Node * start, Node * sibling)
+			static void	_deletionBlackSiblingRedChildRebalance(Node * start, Node * sibling)
 			{
 				Node *	red_child = *sibling->dirs[sibling->getDir()];
 
@@ -139,7 +143,7 @@ namespace ft
 					red_child = *sibling->dirs[!red_child->getDir()];
 				
 				if (!red_child || !red_child->red)
-					throw std::exception("expected at least one red child, got 0");
+					throw std::range_error("expected at least one red child, got 0");
 
 				if (red_child->getDir() == sibling->getDir())
 				{
@@ -154,7 +158,7 @@ namespace ft
 				}
 			};
 
-			void	_deletionRebalance(Node * start)
+			static void	_deletionRebalance(Node * start)
 			{
 				if (!start->parent)
 					return ;
@@ -163,17 +167,20 @@ namespace ft
 
 				if (!sibling
 					|| (!sibling->red && sibling->allChildrensBlack()))
-					this->_deletionBlackSiblingBlackChildRebalance(start, sibling);
+					_deletionBlackSiblingBlackChildRebalance(start, sibling);
 				else if (sibling->red)
-					this->_deletionRedSiblingRebalance(start, sibling);
+					_deletionRedSiblingRebalance(start, sibling);
 				else
-					this->_deletionBlackSiblingRedChildRebalance(start, sibling);
+					_deletionBlackSiblingRedChildRebalance(start, sibling);
 			};
 
-			void	_checkBranches(int ref_height, int cur_height = 0, Node * start = this->root)	const
+			void	_checkBranches(int ref_height, int cur_height = 0, Node * start = nullptr)	const
 			{
+				if (!start)
+					start = this->root;
+
 				if (start->red && start->parent && start->parent->red)
-					throw std::exception("red child have red parent");
+					throw std::logic_error("red child have red parent");
 
 				cur_height += !start->red;
 				cur_height += !start->left;
@@ -184,7 +191,7 @@ namespace ft
 					this->_checkBranches(ref_height, cur_height, start->right);
 
 				if (!start->left && !start->right && cur_height != ref_height)
-					throw std::exception("number of black nodes volatile");
+					throw std::logic_error("number of black nodes volatile");
 			};
 
 			void	_checkTree(void)	const
@@ -207,7 +214,7 @@ namespace ft
 				if (src)
 				{
 					if (src->left || src->right)
-						throw std::exception("moved during replacing node have childs");
+						throw std::range_error("moved during replacing node have childs");
 
 					src->stealLinks(dst);
 				}
@@ -258,51 +265,60 @@ namespace ft
 				return (cursor);
 			};
 
-		public:
-
-			ft::pair<iterator, bool>	insert(const T & val, Node * hint = this->root)
+			Node *	_findPlaceForInsert(const T & val, Node * hint = nullptr)
 			{
-				Node *	parent = this->root;
-				Node **	insertion_side = &this->root;
+				if (hint
+					&& (
+						(this->comparator(val, hint->value) && this->comparator(val, hint->parent->value))
+						|| (this->comparator(hint->value, val) && this->comparator(hint->parent->value, val))
+						)
+					)
+					return (this->_findPlaceForInsert(val));
+				else if (!hint)
+					hint = this->root;
 
-				while (*insertion_side)
+				Node *	crsr = hint;
+
+				while (crsr)
 				{
-					if (this->comparator(val, parent->value))
-						insertion_side = &parent->left;
-					else if (this->comparator(parent->value, val))
-						insertion_side = &parent->right;
+					if (crsr->left && this->comparator(val, crsr->value))
+						crsr = &crsr->left;
+					else if (crsr->right && this->comparator(crsr->value, val))
+						crsr = &crsr->right;
 					else
-						return (ft::make_pair(iterator(parent), false));
-
-					if (*insertion_side)
-						parent = *insertion_side;
+						break;
 				}
 				
+				return (crsr);
+			};
+
+		public:
+
+			ft::pair<iterator, bool>	insert(const T & val, Node * hint = nullptr)
+			{
+				Node *	parent = this->_findPlaceForInsert(val, hint);
+				Node **	insertion_side;
+
+				if (this->comparator(val, parent->value))
+					insertion_side = &parent->left;
+				else if (this->comparator(parent->value, val))
+					insertion_side = &parent->right;
+				else
+					return (ft::make_pair(iterator(parent), false));
+
 				*insertion_side = this->allocator.allocate(1);
 				this->allocator.construct(*insertion_side, Node(val, parent));
 
-				this->_insertionRebalance(*insertion_side);
+				_insertionRebalance(*insertion_side);
 				this->_updateRoot();
 				this->_checkTree();
 
 				return (ft::make_pair(iterator(*insertion_side), ++this->size));
 			};
 
-			Node *	find(const T & val)
+			inline Node *	find(const T & val)
 			{
-				Node *	cursor = this->root;
-
-				while (cursor)
-				{
-					if (this->comparator(val, cursor->value))
-						cursor = cursor->left;
-					else if (this->comparator(cursor->value, val))
-						cursor = cursor->right;
-					else
-						break ;
-				}
-
-				return (cursor);
+				return (this->_findPlaceForInsert(val));
 			};
 
 			void	erase(Node * node)
@@ -316,7 +332,7 @@ namespace ft
 						this->root = node->right;
 				}
 
-				node = this->_internalDeletionHandler(node);
+				node = _internalDeletionHandler(node);
 
 				Node *	child = node->getChild();
 
@@ -326,14 +342,17 @@ namespace ft
 					return ;
 				}
 
-				this->_deletionRebalance(node);
+				_deletionRebalance(node);
 				this->_replaceNode(child, node);
 				this->_updateRoot();
 				this->_checkTree();
 			};
 
-			void	clear(Node * start = this->root)
+			void	clear(Node * start = nullptr)
 			{
+				if (!start)
+					start = this->root;
+
 				if (start->left)
 					this->clear(start->left);
 				if (start->right)

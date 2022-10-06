@@ -63,12 +63,29 @@ namespace ft
 
 		private:
 			key_compare		_comparator;
+			allocator_type	_allocator;
 			Tree			_tree;
+
+			Node *	_find(const key_type & key)
+			{
+				Node *	founded = this->_tree.find(value_type(key, mapped_type()));
+
+				if (this->_comparator(key, founded->value.first))
+					founded = founded->left;
+				else
+					founded = founded->right;
+
+				if (founded
+					&& !this->_comparator(key, founded->value.first)
+					&& !this->_comparator(founded->value.first, key))
+					return (founded);
+				return (nullptr);
+			};
 
 		public:
 
 			explicit map(const key_compare & comp = key_compare(), const allocator_type & alloc = allocator_type())
-				: _comparator(key_compare(comp)), _tree(Tree(allocator_type(alloc), this->_comparator)),
+				: _comparator(key_compare(comp)), _allocator(allocator_type(alloc)), _tree(Tree(alloc, this->_comparator))
 			{};
 
 			template <typename InputIter>
@@ -89,6 +106,7 @@ namespace ft
 			map &	operator=(const map & rhd)
 			{
 				this->_comparator = rhd._comparator;
+				this->_allocator = rhd._allocator;
 				this->_tree = rhd._tree;
 
 				return (*this);
@@ -263,7 +281,7 @@ namespace ft
 
 			iterator	find(const key_type & key)
 			{
-				Node *	founded = this->_tree.find(value_type(key, mapped_type()));
+				Node *	founded = this->_find(key);
 
 				if (founded)
 					return (iterator(founded));
@@ -272,7 +290,7 @@ namespace ft
 
 			const_iterator	find(const key_type & key)	const
 			{
-				Node *	founded = this->_tree.find(value_type(key, mapped_type()));
+				Node *	founded = this->_find(key);
 
 				if (founded)
 					return (const_iterator(founded));
@@ -282,6 +300,49 @@ namespace ft
 			inline size_type	count(const key_type & key)	const
 			{
 				return (this->find(key) != this->end());
+			};
+
+			inline iterator	lower_bound(const key_type & key)
+			{
+				(++iterator(this->_tree.find(value_type(key, mapped_type()))));
+			};
+
+			inline const_iterator	lower_bound(const key_type & key)	const
+			{
+				(++const_iterator(this->_tree.find(value_type(key, mapped_type()))));
+			};
+
+			iterator	upper_bound(const key_type & key)
+			{
+				iterator	it = this->lower_bound(key);
+
+				if (!this->_comparator((*it).first, key) && !this->_comparator(key, (*it).first))
+					return (++it);
+				return (it);
+			};
+
+			const_iterator	upper_bound(const key_type & key)	const
+			{
+				const_iterator	it = this->lower_bound(key);
+
+				if (!this->_comparator((*it).first, key) && !this->_comparator(key, (*it).first))
+					return (++it);
+				return (it);
+			};
+
+			inline ft::pair<iterator, iterator>	equal_range(const key_type & key)
+			{
+				return (ft::make_pair(this->lower_bound(key), this->upper_bound(key)));
+			};
+
+			inline ft::pair<const_iterator, const_iterator>	equal_range(const key_type & key)	const
+			{
+				return (ft::make_pair(this->lower_bound(key), this->upper_bound(key)));
+			};
+
+			inline allocator_type	get_allocator(void)	const
+			{
+				return (this->_allocator);
 			};
 	};
 };
