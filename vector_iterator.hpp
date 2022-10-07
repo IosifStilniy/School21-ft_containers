@@ -103,85 +103,85 @@ namespace ft
 	};
 
 	template <typename IterL, typename IterR>
-	bool	operator==(vector_iterator<IterL> const & lhd, vector_iterator<IterR> const & rhd)
+	inline bool	operator==(vector_iterator<IterL> const & lhd, vector_iterator<IterR> const & rhd)
 	{
 		return (lhd.base() == rhd.base());
 	};
 
 	template <typename Iter>
-	bool	operator==(vector_iterator<Iter> const & lhd, vector_iterator<Iter> const & rhd)
+	inline bool	operator==(vector_iterator<Iter> const & lhd, vector_iterator<Iter> const & rhd)
 	{
 		return (lhd.base() == rhd.base());
 	};
 
 	template <typename IterL, typename IterR>
-	bool	operator!=(vector_iterator<IterL> const & lhd, vector_iterator<IterR> const & rhd)
+	inline bool	operator!=(vector_iterator<IterL> const & lhd, vector_iterator<IterR> const & rhd)
 	{
 		return (lhd.base() != rhd.base());
 	};
 
 	template <typename Iter>
-	bool	operator!=(vector_iterator<Iter> const & lhd, vector_iterator<Iter> const & rhd)
+	inline bool	operator!=(vector_iterator<Iter> const & lhd, vector_iterator<Iter> const & rhd)
 	{
 		return (lhd.base() != rhd.base());
 	};
 
 	template <typename IterL, typename IterR>
-	bool	operator>(vector_iterator<IterL> const & lhd, vector_iterator<IterR> const & rhd)
+	inline bool	operator>(vector_iterator<IterL> const & lhd, vector_iterator<IterR> const & rhd)
 	{
 		return (lhd.base() > rhd.base());
 	};
 
 	template <typename Iter>
-	bool	operator>(vector_iterator<Iter> const & lhd, vector_iterator<Iter> const & rhd)
+	inline bool	operator>(vector_iterator<Iter> const & lhd, vector_iterator<Iter> const & rhd)
 	{
 		return (lhd.base() > rhd.base());
 	};
 
 	template <typename IterL, typename IterR>
-	bool	operator>=(vector_iterator<IterL> const & lhd, vector_iterator<IterR> const & rhd)
+	inline bool	operator>=(vector_iterator<IterL> const & lhd, vector_iterator<IterR> const & rhd)
 	{
 		return (lhd.base() >= rhd.base());
 	};
 
 	template <typename Iter>
-	bool	operator>=(vector_iterator<Iter> const & lhd, vector_iterator<Iter> const & rhd)
+	inline bool	operator>=(vector_iterator<Iter> const & lhd, vector_iterator<Iter> const & rhd)
 	{
 		return (lhd.base() >= rhd.base());
 	};
 
 	template <typename IterL, typename IterR>
-	bool	operator<(vector_iterator<IterL> const & lhd, vector_iterator<IterR> const & rhd)
+	inline bool	operator<(vector_iterator<IterL> const & lhd, vector_iterator<IterR> const & rhd)
 	{
 		return (lhd.base() < rhd.base());
 	};
 
 	template <typename Iter>
-	bool	operator<(vector_iterator<Iter> const & lhd, vector_iterator<Iter> const & rhd)
+	inline bool	operator<(vector_iterator<Iter> const & lhd, vector_iterator<Iter> const & rhd)
 	{
 		return (lhd.base() < rhd.base());
 	};
 
 	template <typename IterL, typename IterR>
-	bool	operator<=(vector_iterator<IterL> const & lhd, vector_iterator<IterR> const & rhd)
+	inline bool	operator<=(vector_iterator<IterL> const & lhd, vector_iterator<IterR> const & rhd)
 	{
 		return (lhd.base() <= rhd.base());
 	};
 
 	template <typename Iter>
-	bool	operator<=(vector_iterator<Iter> const & lhd, vector_iterator<Iter> const & rhd)
+	inline bool	operator<=(vector_iterator<Iter> const & lhd, vector_iterator<Iter> const & rhd)
 	{
 		return (lhd.base() <= rhd.base());
 	};
 
 	template <typename Iter>
-	typename vector_iterator<Iter>::difference_type	operator-(vector_iterator<Iter> const & lhd, vector_iterator<Iter> const & rhd)
+	inline typename vector_iterator<Iter>::difference_type	operator-(vector_iterator<Iter> const & lhd, vector_iterator<Iter> const & rhd)
 	{
 		return (lhd.base() - rhd.base());
 	}
 
 	template <typename Iter>
-	vector_iterator<Iter>	operator+(typename vector_iterator<Iter>::difference_type n, vector_iterator<Iter> const & rhd)
+	inline vector_iterator<Iter>	operator+(typename vector_iterator<Iter>::difference_type n, vector_iterator<Iter> const & rhd)
 	{
 		return (vector_iterator<Iter>(rhd.base() + n));
 	}

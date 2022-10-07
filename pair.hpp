@@ -18,7 +18,7 @@ namespace ft
 			template <typename U, typename V>
 			pair(const pair<U, V> & src) : first(src.first), second(src.second) {};
 
-			pair(const first_type & first, const first_type & second) : first(first), second(second) {};
+			pair(const first_type & first, const second_type & second) : first(first), second(second) {};
 
 			~pair() {};
 
@@ -38,49 +38,49 @@ namespace ft
 	};
 
 	template <typename T1, typename T2>
-	void	swap(const pair<T1, T2> & lhd, const pair<T1, T2> & rhd)
+	inline void	swap(const pair<T1, T2> & lhd, const pair<T1, T2> & rhd)
 	{
 		lhd.swap(rhd);
 	};
 
 	template <typename T1, typename T2>
-	bool	operator==(pair<T1, T2> const & lhd, pair<T1, T2> const & rhd)
+	inline bool	operator==(pair<T1, T2> const & lhd, pair<T1, T2> const & rhd)
 	{
 		return (lhd.first == rhd.first && lhd.second == rhd.second);
 	};
 
 	template <typename T1, typename T2>
-	bool	operator!=(pair<T1, T2> const & lhd, pair<T1, T2> const & rhd)
+	inline bool	operator!=(pair<T1, T2> const & lhd, pair<T1, T2> const & rhd)
 	{
 		return !(lhd == rhd);
 	};
 
 	template <typename T1, typename T2>
-	bool	operator<(pair<T1, T2> const & lhd, pair<T1, T2> const & rhd)
+	inline bool	operator<(pair<T1, T2> const & lhd, pair<T1, T2> const & rhd)
 	{
 		return (lhd.first < rhd.first || (!(lhd.first > rhd.first) && lhd.second == rhd.second));
 	};
 
 	template <typename T1, typename T2>
-	bool	operator<=(pair<T1, T2> const & lhd, pair<T1, T2> const & rhd)
+	inline bool	operator<=(pair<T1, T2> const & lhd, pair<T1, T2> const & rhd)
 	{
 		return !(rhd < lhd);
 	};
 
 	template <typename T1, typename T2>
-	bool	operator>(pair<T1, T2> const & lhd, pair<T1, T2> const & rhd)
+	inline bool	operator>(pair<T1, T2> const & lhd, pair<T1, T2> const & rhd)
 	{
 		return (rhd < lhd);
 	};
 
 	template <typename T1, typename T2>
-	bool	operator>=(pair<T1, T2> const & lhd, pair<T1, T2> const & rhd)
+	inline bool	operator>=(pair<T1, T2> const & lhd, pair<T1, T2> const & rhd)
 	{
 		return !(lhd < rhd);
 	};
 
 	template <typename T1, typename T2>
-	pair<T1, T2>	make_pair(T1 const & first, T2 const & second)
+	inline pair<T1, T2>	make_pair(T1 const & first, T2 const & second)
 	{
 		return (pair<T1, T2>(first, second));
 	};

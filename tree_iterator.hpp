@@ -14,6 +14,8 @@ namespace ft
 			typedef typename	std::bidirectional_iterator_tag		iterator_category;
 
 			Node *	current;
+		
+		private:
 			Node *	root;
 
 		private:
@@ -22,79 +24,32 @@ namespace ft
 				if (*this->current->dirs[forward])
 				{
 					this->current = *this->current->dirs[forward];
+
 					while (*this->current->dirs[!forward])
 						this->current = *this->current->dirs[!forward];
+					
+					return ;
 				}
-				else if (!this->current->getDir() != forward)
-					this->current = this->current->parent;
-				else
-				{
-					this->current = this->current->parent;
 
-					if (!this->current)
-						return ;
-
-					while (this->current->parent && this->current->getDir() == forward)
-						this->current = this->current->parent;
+				while (this->current->getDir() == forward)
 					this->current = this->current->parent;
-				}
+				this->current = this->current->parent;
 			};
 
-			void	_goForward(void)
-			{
-				if (this->current->right)
-				{
-					this->current = this->current->right;
-					while (this->current->left)
-						this->current = this->current->left;
-				}
-				else if (!this->current->getDir())
-					this->current = this->current->parent;
-				else
-				{
-					this->current = this->current->parent;
 
-					if (!this->current)
-						return ;
-
-					while (this->current->getDir())
-						this->current = this->current->parent;
-					this->current = this->current->parent;
-				}
-			};
-
-			void	_goBackward(void)
-			{
-				if (this->current->left)
-				{
-					this->current = this->current->left;
-					while (this->current->right)
-						this->current = this->current->right;
-				}
-				else if (this->current->getDir())
-					this->current = this->current->parent;
-				else
-				{
-					this->current = this->current->parent;
-
-					if (!this->current)
-						return ;
-
-					while (!this->current->getDir())
-						this->current = this->current->parent;
-					this->current = this->current->parent;
-				}
-			};
+			tree_iterator(Node * node, Node *root) : current(node), root(root) {};
 
 		public:
-			explicit tree_iterator(Node * node) : current(node)
+			tree_iterator(void) {};
+
+			tree_iterator(Node * node) : current(node)
 			{
-				while (node->parent)
+				while (node && node->parent)
 					node = node->parent;
 				this->root = node;
 			};
 
-			explicit tree_iterator(const tree_iterator & it) : current(it.current), root(it.root) {};
+			tree_iterator(const tree_iterator & it) : current(it.current), root(it.root) {};
 
 			~tree_iterator() {};
 
@@ -102,6 +57,8 @@ namespace ft
 			{
 				this->current = rhd.current;
 				this->root = rhd.root;
+
+				return (*this);
 			};
 
 			reference	operator*(void)	const
@@ -116,20 +73,39 @@ namespace ft
 
 			tree_iterator	operator++(void)
 			{
+				if (!this->root)
+					return (*this);
+
 				if (!this->current)
-					return (tree_iterator(this->current));
+				{
+					this->current = this->root;
+					while (this->current->left)
+						this->current = this->current->left;
+					
+					return (*this);
+				}
 
 				this->_go(true);
 
-				return (tree_iterator(this->current));
+				return (*this);
 			};
 
 			tree_iterator	operator++(int)
 			{
+				if (!this->root)
+					return (*this);
+
 				tree_iterator	it = tree_iterator(this->current);
 
 				if (!this->current)
-					return (it);
+				{
+					this->current = this->root;
+
+					while (this->current->left)
+						this->current = this->current->left;
+					
+					return (*this);
+				}
 
 				this->_go(true);
 
@@ -138,41 +114,65 @@ namespace ft
 
 			tree_iterator	operator--(void)
 			{
+				if (!this->root)
+					return (*this);
+
 				if (!this->current)
 				{
 					this->current = this->root;
 					while (this->current->right)
 						this->current = this->current->right;
 					
-					return (tree_iterator(this->current));
+					return (*this);
 				}
 
 				this->_go(false);
 
-				return (tree_iterator(this->current));
+				return (*this);
 			};
 
 			tree_iterator	operator--(int)
 			{
+				if (!this->root)
+					return (*this);
+				
 				tree_iterator	it = tree_iterator(this->current);
 
 				if (!this->current)
-					return (it);
+				{
+					this->current = this->root;
+					while (this->current->right)
+						this->current = this->current->right;
+					
+					return (*this);
+				}
 
 				this->_go(false);
 
 				return (it);
 			};
 
-			bool	operator==(const tree_iterator & lhd)	const
+			bool	operator==(const tree_iterator & rhd)	const
 			{
-				return (this->current == lhd.current);
+				return (this->current == rhd.current);
 			};
 
-			bool	operator!=(const tree_iterator & lhd)	const
+			bool	operator!=(const tree_iterator & rhd)	const
 			{
-				return (this->current != lhd.current);
+				return (this->current != rhd.current);
 			};
+	};
+
+	template <typename Iter1, typename Iter2>
+	inline bool	operator==(const Iter1 & lhd, const Iter2 & rhd)
+	{
+		return (lhd.current == rhd.current);
+	};
+
+	template <typename Iter1, typename Iter2>
+	inline bool	operator!=(const Iter1 & lhd, const Iter2 & rhd)
+	{
+		return (lhd.current != rhd.current);
 	};
 };
 

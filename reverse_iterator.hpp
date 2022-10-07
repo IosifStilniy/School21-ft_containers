@@ -26,6 +26,7 @@ namespace ft
 			typedef	typename	_traits_type::reference			reference;
 
 			reverse_iterator(void) : _current() {};
+			
 			explicit reverse_iterator(iterator_type it) : _current(it) {};
 
 			reverse_iterator(const reverse_iterator & src)

@@ -6,6 +6,10 @@
 # include "pair.hpp"
 # include "tree_iterator.hpp"
 # include "tree_node.hpp"
+# include "reverse_iterator.hpp"
+
+# include <iostream>
+# include <string>
 
 namespace ft
 {
@@ -20,9 +24,9 @@ namespace ft
 			typedef typename	allocator_type::size_type							size_type;
 			typedef typename	ft::tree_iterator<T, Node >							iterator;
 			typedef typename	ft::tree_iterator<const T, Node >					const_iterator;
-			typedef typename	ft::iterator_traits<iterator>::difference_type		difference_type;
 			typedef typename	ft::reverse_iterator<iterator>						reverse_iterator;
 			typedef typename	ft::reverse_iterator<const_iterator>				const_reverse_iterator;
+			typedef typename	ft::iterator_traits<iterator>::difference_type		difference_type;
 
 		public:
 
@@ -70,6 +74,9 @@ namespace ft
 
 			void	_updateRoot(void)
 			{
+				if (!this->root)
+					return ;
+					
 				while (this->root->parent)
 					this->root = this->root->parent;				
 			};
@@ -148,7 +155,10 @@ namespace ft
 				if (red_child->getDir() == sibling->getDir())
 				{
 					sibling->getOnSurface();
+					sibling->red = true;
 					red_child->red = false;
+					if (*sibling->dirs[!red_child->getDir()])
+						(*sibling->dirs[!red_child->getDir()])->red = false;
 				}
 				else
 				{
@@ -174,28 +184,39 @@ namespace ft
 					_deletionBlackSiblingRedChildRebalance(start, sibling);
 			};
 
-			void	_checkBranches(int ref_height, int cur_height = 0, Node * start = nullptr)	const
+			void	_checkBranches(Node * start, int ref_height, int cur_height = 0)	const
 			{
-				if (!start)
-					start = this->root;
-
-				if (start->red && start->parent && start->parent->red)
+				if (start && start->red && start->parent && start->parent->red)
+				{
+					_print_value(this->root, "root: ");
+					_print_value(start, "red child: ");
+					_print_value(start->parent, "red parent: ");
+					_print_value(start->parent->parent, "grandpa: ");
+					std::cout << "grandpa color: " << start->parent->parent->red << std::endl;
+					_print_value(start->getUncle(), "uncle: ");
+					std::cout << "uncle color: " << start->getUncle()->red << std::endl;
 					throw std::logic_error("red child have red parent");
+				}
 
-				cur_height += !start->red;
-				cur_height += !start->left;
+				cur_height += (!start || !start->red);
 
-				if (start->left)
-					this->_checkBranches(ref_height, cur_height, start->left);
-				if (start->right)
-					this->_checkBranches(ref_height, cur_height, start->right);
+				if (!start)
+				{
+					if (cur_height != ref_height)
+						throw std::logic_error("number of black nodes volatile");
 
-				if (!start->left && !start->right && cur_height != ref_height)
-					throw std::logic_error("number of black nodes volatile");
+					return ;
+				}
+
+				this->_checkBranches(start->left, ref_height, cur_height);
+				this->_checkBranches(start->right, ref_height, cur_height);
 			};
 
 			void	_checkTree(void)	const
 			{
+				if (!this->root)
+					return ;
+
 				Node *	cursor = this->root;
 				int		height = 0;
 
@@ -206,7 +227,7 @@ namespace ft
 					cursor = cursor->left;
 				}
 
-				this->_checkBranches(height);
+				this->_checkBranches(this->root, height);
 			};
 
 			void	_replaceNode(Node * src, Node * dst)
@@ -214,12 +235,12 @@ namespace ft
 				if (src)
 				{
 					if (src->left || src->right)
-						throw std::range_error("moved during replacing node have childs");
+						throw std::range_error("node have childs, it's cannot be moved");
 
 					src->stealLinks(dst);
 				}
 				else
-					*dst->dirs[dst->getDir()] = nullptr;
+					*dst->parent->dirs[dst->getDir()] = nullptr;
 
 				this->allocator.destroy(dst);
 				this->allocator.deallocate(dst, 1);
@@ -243,14 +264,14 @@ namespace ft
 				}
 				else
 					return (node);
-
+				
 				Node *	dummy = this->allocator.allocate(1);
 
 				this->allocator.construct(dummy, Node());
 
 				dummy->stealLinks(cursor);
 
-				this->_replaceNode(dummy, node);
+				this->_replaceNode(cursor, node);
 
 				return (dummy);
 			};
@@ -261,7 +282,7 @@ namespace ft
 
 				while (cursor && *cursor->dirs[end])
 					cursor = *cursor->dirs[end];
-				
+
 				return (cursor);
 			};
 
@@ -282,9 +303,9 @@ namespace ft
 				while (crsr)
 				{
 					if (crsr->left && this->comparator(val, crsr->value))
-						crsr = &crsr->left;
+						crsr = crsr->left;
 					else if (crsr->right && this->comparator(crsr->value, val))
-						crsr = &crsr->right;
+						crsr = crsr->right;
 					else
 						break;
 				}
@@ -292,14 +313,26 @@ namespace ft
 				return (crsr);
 			};
 
+			static void	_print_value(Node * node, std::string before = std::string(""), std::string after = std::string(""))
+			{
+				if (before.size())
+					std::cout << before;
+				std::cout << node->value.first << " " << node->value.second;
+				if (after.size())
+					std::cout << after;
+				std::cout << std::endl;
+			};
+
 		public:
 
 			ft::pair<iterator, bool>	insert(const T & val, Node * hint = nullptr)
 			{
 				Node *	parent = this->_findPlaceForInsert(val, hint);
-				Node **	insertion_side;
+				Node **	insertion_side = &parent;
 
-				if (this->comparator(val, parent->value))
+				if (!parent)
+					insertion_side = &this->root;
+				else if (this->comparator(val, parent->value))
 					insertion_side = &parent->left;
 				else if (this->comparator(parent->value, val))
 					insertion_side = &parent->right;
@@ -313,10 +346,10 @@ namespace ft
 				this->_updateRoot();
 				this->_checkTree();
 
-				return (ft::make_pair(iterator(*insertion_side), ++this->size));
+				return (ft::make_pair(iterator(*insertion_side), bool(++this->size)));
 			};
 
-			inline Node *	find(const T & val)
+			Node *	find(const T & val)
 			{
 				return (this->_findPlaceForInsert(val));
 			};
@@ -333,7 +366,8 @@ namespace ft
 				}
 
 				node = _internalDeletionHandler(node);
-
+				
+				_print_value(node->parent, "after replace: ");
 				Node *	child = node->getChild();
 
 				if (node->red || (child && child->red))
@@ -352,6 +386,8 @@ namespace ft
 			{
 				if (!start)
 					start = this->root;
+				if (!start)
+					return ;
 
 				if (start->left)
 					this->clear(start->left);
@@ -368,24 +404,52 @@ namespace ft
 				this->size = 0;
 			};
 
-			inline iterator	begin(void)
+			iterator	begin(void)
 			{
-				return (iterator(this->_iteratorRoutine(true)));
+				return (iterator(this->_iteratorRoutine(false)));
 			};
 
-			inline const_iterator	cbegin(void)	const
+			const_iterator	cbegin(void)	const
 			{
-				return (const_iterator(this->_iteratorRoutine(true)));
+				return (const_iterator(this->_iteratorRoutine(false)));
 			};
 
-			inline iterator	end(void)
+			iterator	end(void)
 			{
 				return (++iterator(this->_iteratorRoutine(true)));
 			};
 
-			inline const_iterator	cend(void)	const
+			const_iterator	cend(void)	const
 			{
 				return (++const_iterator(this->_iteratorRoutine(true)));
+			};
+
+			reverse_iterator	rbegin(void)
+			{
+				return (reverse_iterator(this->end()));
+			};
+
+			const_reverse_iterator	crbegin(void)	const
+			{
+				return (const_reverse_iterator(this->cend()));
+			};
+
+			reverse_iterator	rend(void)
+			{
+				return (reverse_iterator(this->begin()));
+			};
+
+			const_reverse_iterator	crend(void)	const
+			{
+				return (const_reverse_iterator(this->begin()));
+			};
+
+			void	swap(const RedBlackTree & ref)
+			{
+				Node *	buf = this->root;
+
+				this->root = ref.root;
+				ref.root = buf;
 			};
 	};
 }

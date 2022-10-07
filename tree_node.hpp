@@ -8,14 +8,6 @@ namespace ft
 	template <typename T>
 	class TreeNode
 	{
-		private:
-			TreeNode(const TreeNode * parent = nullptr)
-				: value(), red(false), left(nullptr), right(nullptr), parent(parent)
-			{
-				this->dirs[0] = &this->left;
-				this->dirs[1] = &this->right;
-			}
-
 		public:
 
 			T				value;
@@ -25,22 +17,50 @@ namespace ft
 			TreeNode	*	parent;
 			TreeNode	**	dirs[2];
 
-			TreeNode(const T & value, const TreeNode * parent, const bool red = true)
-				: TreeNode(parent), value(value), red(red)
-			{};
+			TreeNode(void)
+				: value(), red(false), left(nullptr), right(nullptr), parent(nullptr)
+			{
+				this->dirs[0] = &this->left;
+				this->dirs[1] = &this->right;
+			};
+
+			TreeNode(const T & value, TreeNode * parent, const bool red = true)
+				: value(value)
+			{
+				*this = TreeNode();
+				this->parent = parent;
+				this->red = red;
+
+				this->dirs[0] = &this->left;
+				this->dirs[1] = &this->right;
+			};
 
 			TreeNode(const TreeNode & src)
-				: TreeNode(), value(src.value), red(src.red)
-			{};
+				: value(src.value)
+			{
+				*this = src;
+
+				this->dirs[0] = &this->left;
+				this->dirs[1] = &this->right;
+			};
 
 			~TreeNode() {};
+
+			TreeNode &	operator=(TreeNode const & rhd)
+			{
+				this->red = rhd.red;
+				this->left = rhd.left;
+				this->parent = rhd.parent;
+
+				return (*this);
+			};
 
 			TreeNode *	getUncle(void)	const
 			{
 				if (!this->parent || !this->parent->parent)
-					throw std::range_error("node have no ancestors");
+					return (nullptr);
 				
-				return (*this->parent->parent->dirs[this->parent->getDir()]);
+				return (*this->parent->parent->dirs[!this->parent->getDir()]);
 			};
 			
 			bool	isOuterGrandchild(void)	const
@@ -58,7 +78,7 @@ namespace ft
 			int	getDir(void)	const
 			{
 				if (!this->parent)
-					throw std::range_error("node have no parent");
+					return (-1);
 				
 				if (*this->parent->dirs[0] == this)
 					return (0);
@@ -103,7 +123,7 @@ namespace ft
 					*this->parent->dirs[src.getDir()] = this;
 			};
 
-			inline void	stealLinks(const TreeNode * src)
+			void	stealLinks(const TreeNode * src)
 			{
 				this->stealLinks(*src);
 			};
@@ -126,7 +146,7 @@ namespace ft
 				return (*this->parent->dirs[!this->getDir()]);
 			};
 
-			inline bool	allChildrensBlack(void)	const
+			bool	allChildrensBlack(void)	const
 			{
 				return ((!this->left || !this->left->red) && (!this->right || !this->right->red));
 			};
