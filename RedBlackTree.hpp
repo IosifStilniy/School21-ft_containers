@@ -117,56 +117,72 @@ namespace ft
 				}
 			};
 
-			static void	_deletionBlackSiblingBlackChildRebalance(Node * start, Node * sibling)
-			{
-				if (sibling)
-					sibling->red = true;
-				else
-					start->red = true;
+			// static void	_deletionBlackSiblingBlackChildRebalance(Node * start, Node * sibling)
+			// {
+			// 	if (sibling)
+			// 		sibling->red = true;
+			// 	else
+			// 		start->red = true;
 
-				if (start->parent->red)
-					start->parent->red = false;
-				else
-					_deletionRebalance(start->parent);
-			}
+			// 	if (start->parent->red)
+			// 		start->parent->red = false;
+			// 	else
+			// 		_deletionRebalance(start->parent);
+			// }
 
-			static void	_deletionRedSiblingRebalance(Node * start, Node * sibling)
-			{
-				sibling->getOnSurface();
-				sibling->red = false;
+			// static void	_deletionRedSiblingRebalance(Node * start, Node * sibling)
+			// {
+			// 	sibling->getOnSurface();
+			// 	sibling->red = false;
 
-				if (start->parent->red)
-					throw std::logic_error("parent must be black");
+			// 	if (start->parent->red)
+			// 		throw std::logic_error("parent must be black");
 				
-				if (*start->parent->dirs[!start->getDir()])
-					(*start->parent->dirs[!start->getDir()])->red = true;
-			}
+			// 	if (*start->parent->dirs[!start->getDir()])
+			// 		(*start->parent->dirs[!start->getDir()])->red = true;
+			// }
 
-			static void	_deletionBlackSiblingRedChildRebalance(Node * start, Node * sibling)
-			{
-				Node *	red_child = *sibling->dirs[sibling->getDir()];
+			// static void	_deletionBlackSiblingRedChildRebalance(Node * start, Node * sibling)
+			// {
+			// 	Node *	red_child = *sibling->dirs[sibling->getDir()];
 
-				if (!red_child || !red_child->red)
-					red_child = *sibling->dirs[!red_child->getDir()];
+			// 	if (!red_child || !red_child->red)
+			// 		red_child = *sibling->dirs[!red_child->getDir()];
 				
-				if (!red_child || !red_child->red)
-					throw std::range_error("expected at least one red child, got 0");
+			// 	if (!red_child || !red_child->red)
+			// 		throw std::range_error("expected at least one red child, got 0");
 
-				if (red_child->getDir() == sibling->getDir())
-				{
-					sibling->getOnSurface();
-					sibling->red = true;
-					red_child->red = false;
-					if (*sibling->dirs[!red_child->getDir()])
-						(*sibling->dirs[!red_child->getDir()])->red = false;
-				}
-				else
-				{
-					red_child->getOnSurface();
-					red_child->getOnSurface();
-					red_child->red = false;
-				}
-			};
+			// 	if (red_child->getDir() == sibling->getDir())
+			// 	{
+			// 		sibling->getOnSurface();
+			// 		sibling->red = true;
+			// 		red_child->red = false;
+			// 		if (*sibling->dirs[!red_child->getDir()])
+			// 			(*sibling->dirs[!red_child->getDir()])->red = false;
+			// 	}
+			// 	else
+			// 	{
+			// 		red_child->getOnSurface();
+			// 		red_child->getOnSurface();
+			// 		red_child->red = false;
+			// 	}
+			// };
+
+			// static void	_deletionRebalance(Node * start)
+			// {
+			// 	if (!start->parent)
+			// 		return ;
+				
+			// 	Node *	sibling = start->getSibling();
+
+			// 	if (!sibling
+			// 		|| (!sibling->red && sibling->allChildrensBlack()))
+			// 		_deletionBlackSiblingBlackChildRebalance(start, sibling);
+			// 	else if (sibling->red)
+			// 		_deletionRedSiblingRebalance(start, sibling);
+			// 	else
+			// 		_deletionBlackSiblingRedChildRebalance(start, sibling);
+			// };
 
 			static void	_deletionRebalance(Node * start)
 			{
@@ -175,13 +191,25 @@ namespace ft
 				
 				Node *	sibling = start->getSibling();
 
-				if (!sibling
-					|| (!sibling->red && sibling->allChildrensBlack()))
-					_deletionBlackSiblingBlackChildRebalance(start, sibling);
-				else if (sibling->red)
-					_deletionRedSiblingRebalance(start, sibling);
-				else
-					_deletionBlackSiblingRedChildRebalance(start, sibling);
+				if (!sibling)
+					throw std::logic_error("deleted node must have sibling at this stage");
+
+				if (!sibling->red && sibling->allChildrensBlack())
+				{
+					sibling->red = true;
+
+					if (!start->parent->red)
+						_deletionRebalance(start->parent);
+					else
+						start->parent->red = false;
+				}
+				else if (sibling->red && sibling->allChildrensBlack())
+				{
+					sibling->getOnSurface();
+					sibling->red = false;
+					start->parent->red = true;
+					_deletionRebalance(start);
+				}
 			};
 
 			void	_checkBranches(Node * start, int ref_height, int cur_height = 0)	const
@@ -233,34 +261,38 @@ namespace ft
 			void	_replaceNode(Node * src, Node * dst)
 			{
 				if (src)
-				{
-					if (src->left || src->right)
-						throw std::range_error("node have childs, it's cannot be moved");
-
 					src->stealLinks(dst);
-				}
 				else
 					*dst->parent->dirs[dst->getDir()] = nullptr;
 
 				this->allocator.destroy(dst);
 				this->allocator.deallocate(dst, 1);
 			};
-			
+
+			void	_deleteNode(Node *node)
+			{
+				Node *	child = node->getChild();
+
+				*node->parent->dirs[node->getDir()] = child;
+				if (child)
+				{
+					child->parent = node->parent;
+					child->red = node->red;
+				}
+
+				this->allocator.destroy(node);
+				this->allocator.deallocate(node, 1);
+			};
+
 			Node *	_internalDeletionHandler(Node * node)
 			{
 				Node *	cursor = nullptr;
 
-				if (node->left)
+				if (node->left && node->right)
 				{
 					cursor = node->left;
 					while (cursor->right)
 						cursor = cursor->right;
-				}
-				else if (node->right)
-				{
-					cursor = node->right;
-					while (cursor->left)
-						cursor = cursor->left;
 				}
 				else
 					return (node);
@@ -317,7 +349,10 @@ namespace ft
 			{
 				if (before.size())
 					std::cout << before;
-				std::cout << node->value.first << " " << node->value.second;
+				if (node)
+					std::cout << node->value.first << " " << node->value.second << " color: " << node->red;
+				else
+					std::cout << "(null)";
 				if (after.size())
 					std::cout << after;
 				std::cout << std::endl;
@@ -354,10 +389,34 @@ namespace ft
 				return (this->_findPlaceForInsert(val));
 			};
 
+			// void	erase(Node * node)
+			// {
+			// 	if (node == this->root)
+			// 	{
+			// 		this->root = node->left;
+			// 		if (!node->left)
+			// 			this->root = node->right;
+			// 	}
+
+			// 	node = _internalDeletionHandler(node);
+				
+			// 	Node *	child = node->getChild();
+
+			// 	if (node->red || (child && child->red))
+			// 		this->_deleteNode(node);
+			// 	else
+			// 	{
+			// 		_deletionRebalance(node);
+			// 		this->_replaceNode(child, node);
+			// 	}
+				
+			// 	this->_updateRoot();
+			// 	this->_checkTree();
+			// 	this->size--;
+			// };
+
 			void	erase(Node * node)
 			{
-				this->size--;
-
 				if (node == this->root)
 				{
 					this->root = node->left;
@@ -367,19 +426,19 @@ namespace ft
 
 				node = _internalDeletionHandler(node);
 				
-				_print_value(node->parent, "after replace: ");
 				Node *	child = node->getChild();
 
-				if (node->red || (child && child->red))
-				{
-					this->_replaceNode(child, node);
-					return ;
-				}
-
-				_deletionRebalance(node);
-				this->_replaceNode(child, node);
+				if (node->red && child)
+					throw std::logic_error("red node to be removed cannot have childs");
+				else if (child && !child->red)
+					throw std::logic_error("node to be removed cannot have black child");
+				else if (!node->red && !child)
+					_deletionRebalance(node);
+				
+				this->_deleteNode(node);
 				this->_updateRoot();
 				this->_checkTree();
+				this->size--;
 			};
 
 			void	clear(Node * start = nullptr)
