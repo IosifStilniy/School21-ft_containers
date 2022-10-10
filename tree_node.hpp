@@ -50,6 +50,7 @@ namespace ft
 			{
 				this->red = rhd.red;
 				this->left = rhd.left;
+				this->right = rhd.right;
 				this->parent = rhd.parent;
 
 				return (*this);
@@ -130,9 +131,6 @@ namespace ft
 
 			TreeNode *	getChild(void)	const
 			{
-				if (this->left && this->right)
-					throw std::range_error("node have both childs");
-				
 				if (this->left)
 					return (this->left);
 				return (this->right);

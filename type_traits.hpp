@@ -15,8 +15,8 @@ namespace	ft
 	template <typename T, T v>
 	struct integral_constant
 	{
-		typedef	T							value_type;
-		typedef	integral_constant<T, v>		type;
+		typedef	T					value_type;
+		typedef	integral_constant	type;
 
 		static const T	value = v;
 
@@ -103,6 +103,12 @@ namespace	ft
 
 	template <typename T>
 	struct is_integral : public _is_integral_helper< typename _remove_cv<T>::type >::type {};
+
+	template<typename T1, typename T2>
+	struct is_same : false_type {};
+
+	template <typename T>
+	struct is_same<T, T> : true_type {};
 };
 
 #endif

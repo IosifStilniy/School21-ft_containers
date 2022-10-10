@@ -83,10 +83,14 @@ namespace ft
 
 		public:
 
-			explicit	vector(const allocator_type & alloc = allocator_type()) : _values(nullptr), _size(0), _capacity(0), _allocator(alloc) {};
+			// vector(void) : _values(nullptr), _size(0), _capacity(0), _allocator() {};
+
+			explicit	vector(const allocator_type & alloc = allocator_type())
+				: _values(nullptr), _size(0), _capacity(0), _allocator(alloc) {};
 
 			explicit	vector(size_type n, const value_type & val = value_type(),
-				const allocator_type & alloc = allocator_type()) : _size(n), _capacity(n)
+				const allocator_type & alloc = allocator_type())
+					: _values(nullptr), _size(n), _capacity(n)
 			{
 				this->_allocator = allocator_type(alloc);
 
@@ -97,24 +101,21 @@ namespace ft
 
 			template <class InputIterator>
 			vector(InputIterator first, InputIterator last, const allocator_type & alloc = allocator_type())
+				: _values(nullptr), _size(std::distance(first, last)), _capacity(std::distance(first, last)), _allocator(alloc)
 			{
-				this->_allocator = allocator_type(alloc);
-
 				this->_values = this->_allocator.allocate(std::distance(first, last));
 				std::copy(first, last, this->begin());
 			};
 
 			vector(const vector & src)
+				: _values(nullptr), _size(0), _capacity(0)
 			{
 				*this = src;
 			};
 
 			~vector()
 			{
-				for (size_type i = 0; i < this->size(); i++)
-					_allocator.destroy(this->_values + i);
-
-				_allocator.deallocate(this->_values, this->_capacity);
+				this->clear();
 			};
 
 			vector &	operator=(vector const & rhd)
@@ -123,7 +124,7 @@ namespace ft
 				{
 
 					for (size_type i = 0; i < this->_capacity; i++)
-						_allocator.destroy(this->_values[i]);
+						_allocator.destroy(this->_values + i);
 					
 					_allocator.deallocate(this->_values, this->_capacity);
 					this->_values = _allocator.allocate(rhd._capacity);
@@ -137,6 +138,8 @@ namespace ft
 				
 				for (size_type i = this->_size; i < this->_capacity; i++)
 					_allocator.construct(this->_values + i, value_type());
+				
+				return (*this);
 			};
 
 			inline reference	operator[](size_type n)
@@ -349,7 +352,7 @@ namespace ft
 			void	push_back(const_reference val)
 			{
 				if (this->_size == this->_capacity)
-					this->reserve(this->_size * 2);
+					this->reserve(this->_size * 2 + !this->_size);
 				this->_allocator.construct(this->_values + this->_size++, val);
 			};
 
@@ -409,13 +412,13 @@ namespace ft
 
 			void	swap(vector & src)
 			{
-				value_type *	buf = src->_values;
-				size_type		size_buf = src->_size;
-				size_type		capacity_buf = src->_capacity;
+				value_type *	buf = src._values;
+				size_type		size_buf = src._size;
+				size_type		capacity_buf = src._capacity;
 
-				src->_values = this->_values;
-				src->_size = this->_size;
-				src->_capacity = this->_capacity;
+				src._values = this->_values;
+				src._size = this->_size;
+				src._capacity = this->_capacity;
 				this->_values = buf;
 				this->_size = size_buf;
 				this->_capacity = capacity_buf;
