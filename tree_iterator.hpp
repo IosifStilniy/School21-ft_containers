@@ -1,6 +1,9 @@
 #ifndef TREE_ITERATOR_HPP
 # define TREE_ITERATOR_HPP
 
+# include <iterator>
+# include "type_traits.hpp"
+
 namespace ft
 {
 	template <typename T, typename Node>
@@ -14,8 +17,6 @@ namespace ft
 			typedef typename	std::bidirectional_iterator_tag		iterator_category;
 
 			Node *	current;
-		
-		private:
 			Node *	root;
 
 		private:
@@ -51,9 +52,29 @@ namespace ft
 
 			tree_iterator(const tree_iterator & it) : current(it.current), root(it.root) {};
 
+			template <typename _T>
+			tree_iterator(const tree_iterator<
+												_T,
+												typename ft::enable_if<(ft::is_same<const _T, T>::value), Node>::type
+												> & it)
+				: current(it.current), root(it.root)
+			{};
+
 			~tree_iterator() {};
 
 			tree_iterator &	operator=(const tree_iterator & rhd)
+			{
+				this->current = rhd.current;
+				this->root = rhd.root;
+
+				return (*this);
+			};
+
+			template <typename _T>
+			tree_iterator &	operator=(const tree_iterator<
+															_T,
+															typename ft::enable_if<(ft::is_same<const _T, T>::value), Node>::type
+															> & rhd)
 			{
 				this->current = rhd.current;
 				this->root = rhd.root;

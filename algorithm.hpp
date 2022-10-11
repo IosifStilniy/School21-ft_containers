@@ -30,9 +30,9 @@ namespace ft
 	};
 
 	template <typename InpIter1, typename InpIter2>
-	bool	lexicographical_compare(InpIter1 first1, InpIter1 last, InpIter2 first2, InpIter2 last2)
+	bool	lexicographical_compare(InpIter1 first1, InpIter1 last1, InpIter2 first2, InpIter2 last2)
 	{
-		while (first1 != last)
+		while (first1 != last1)
 		{
 			if (first2 == last2 || *first2 < *first1)
 				return (false);
@@ -46,13 +46,13 @@ namespace ft
 	};
 
 	template <typename InpIter1, typename InpIter2, typename Comparator>
-	bool	lexicographical_compare(InpIter1 first1, InpIter1 last, InpIter2 first2, InpIter2 last2, Comparator comp)
+	bool	lexicographical_compare(InpIter1 first1, InpIter1 last1, InpIter2 first2, InpIter2 last2, Comparator comp)
 	{
-		while (first1 != last)
+		while (first1 != last1)
 		{
-			if (first2 == last2 || comp(*first1, *first2))
+			if (first2 == last2 || comp(*first2, *first1))
 				return (false);
-			if (!comp(*first1, *first2))
+			if (comp(*first1, *first2))
 				return (true);
 			first1++;
 			first2++;

@@ -7,6 +7,7 @@
 # include "reverse_iterator.hpp"
 # include "pair.hpp"
 # include "iterator_traits.hpp"
+# include "type_traits.hpp"
 # include "RedBlackTree.hpp"
 
 namespace ft
@@ -27,6 +28,13 @@ namespace ft
 			typedef	typename	allocator_type::const_pointer								const_pointer;
 			typedef typename	allocator_type::size_type									size_type;
 
+		private:
+			typedef typename	ft::enable_if<
+												ft::is_same<value_type, typename allocator_type::value_type>::value,
+												value_type
+											>::type							_value_type;
+		
+		public:
 			class value_compare : public std::binary_function<value_type, value_type, bool>
 			{
 				friend class map;
@@ -94,7 +102,6 @@ namespace ft
 
 			mapped_type &	operator[](const key_type & key)
 			{
-				std::cout << "key: " << key << std::endl;
 				iterator	founded = this->find(key);
 
 				if (founded != this->end())

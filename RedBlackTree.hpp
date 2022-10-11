@@ -41,8 +41,8 @@ namespace ft
 				: root(nullptr), allocator(allocator_type(alloc)), comparator(Comparator(comparator)), size(0)
 			{};
 
-			explicit RedBlackTree(const RedBlackTree & src)
-				: root(nullptr), allocator(src.allocator), comparator(src.comparator), size(src.size)
+			RedBlackTree(const RedBlackTree & src)
+				: root(nullptr), allocator(src.allocator), comparator(src.comparator), size(0)
 			{
 				this->_copy(src.root, &this->root);
 			};
@@ -67,12 +67,17 @@ namespace ft
 			void	_copy(const Node * src, Node ** dst, Node * parent = nullptr)
 			{
 				if (!src)
+				{
+					*dst = nullptr;
 					return ;
+				}
 
+				this->size++;
 				*dst = this->allocator.allocate(1);
 				this->allocator.construct(*dst, *src);
+				(*dst)->parent = parent;
 				this->_copy(src->left, &(*dst)->left, *dst);
-				this->_copy(src->left, &(*dst)->right, *dst);
+				this->_copy(src->right, &(*dst)->right, *dst);
 			};
 
 			void	_updateRoot(void)
@@ -317,15 +322,13 @@ namespace ft
 				*insertion_side = this->allocator.allocate(1);
 				this->allocator.construct(*insertion_side, Node(val, parent));
 
-				std::cout << "tut" << std::endl;
-				std::cout << *insertion_side << std::endl;
-				_insertionRebalance(*insertion_side);
-				std::cout << *insertion_side << std::endl;
-				this->_updateRoot();
-				this->_checkTree();
+				Node *	inserted = *insertion_side;
 
-				std::cout << "tam" << std::endl;
-				return (ft::make_pair(iterator(*insertion_side), bool(++this->size)));
+				_insertionRebalance(inserted);
+				this->_updateRoot();
+				// this->_checkTree();
+
+				return (ft::make_pair(iterator(inserted), bool(++this->size)));
 			};
 
 			iterator	find(const T & val)
@@ -410,7 +413,7 @@ namespace ft
 				
 				this->_deleteNode(node);
 				this->_updateRoot();
-				this->_checkTree();
+				// this->_checkTree();
 				this->size--;
 			};
 
