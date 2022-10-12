@@ -27,6 +27,12 @@ namespace ft
 
 			~stack() {};
 
+			template <typename _T, typename _Sequence>
+			friend bool	operator==(stack<_T, _Sequence> const & lhd, stack<_T, _Sequence> const & rhd);
+
+			template <typename _T, typename _Sequence>
+			friend bool	operator<(stack<_T, _Sequence> const & lhd, stack<_T, _Sequence> const & rhd);
+
 			bool	empty(void)	const
 			{
 				return (c.empty());
@@ -72,7 +78,7 @@ namespace ft
 	template <typename T, typename Sequence>
 	bool	operator!=(stack<T, Sequence> const & lhd, stack<T, Sequence> const & rhd)
 	{
-		return !(lhd.c == rhd.c);
+		return !(lhd == rhd);
 	};
 
 	template <typename T, typename Sequence>
@@ -84,23 +90,23 @@ namespace ft
 	template <typename T, typename Sequence>
 	bool	operator<=(stack<T, Sequence> const & lhd, stack<T, Sequence> const & rhd)
 	{
-		return !(rhd.c < lhd.c);
+		return !(rhd < lhd);
 	};
 
 	template <typename T, typename Sequence>
 	bool	operator>(stack<T, Sequence> const & lhd, stack<T, Sequence> const & rhd)
 	{
-		return (rhd.c < lhd.c);
+		return (rhd < lhd);
 	};
 
 	template <typename T, typename Sequence>
 	bool	operator>=(stack<T, Sequence> const & lhd, stack<T, Sequence> const & rhd)
 	{
-		return !(lhd.c < rhd.c);
+		return !(lhd < rhd);
 	};
 
 	template <typename T, typename Sequence>
-	void	swap(stack<T, Sequence> const & lhd, stack<T, Sequence> const & rhd)
+	void	swap(stack<T, Sequence> & lhd, stack<T, Sequence> & rhd)
 	{
 		lhd.swap(rhd);
 	};

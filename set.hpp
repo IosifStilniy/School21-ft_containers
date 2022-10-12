@@ -3,6 +3,9 @@
 
 # include <functional>
 # include <memory>
+# include <limits>
+# include <algorithm>
+# include "algorithm.hpp"
 # include "RedBlackTree.hpp"
 # include "iterator_traits.hpp"
 # include "pair.hpp"
@@ -47,14 +50,12 @@ namespace ft
 			set (InpIter first, InpIter last, const key_compare & comp = key_compare(), const allocator_type & alloc = allocator_type())
 				: _comparator(key_compare(comp)), _tree(Tree(alloc, comp))
 			{
-				for (; first != last; first++)
-					this->_tree.insert(*first);
+				this->insert(first, last);
 			};
 
 			set(const set & src)
-			{
-				*this = src;
-			};
+				: _comparator(src._comparator), _tree(src._tree)
+			{};
 
 			~set() {};
 
@@ -137,7 +138,7 @@ namespace ft
 
 			size_type	max_size(void)	const
 			{
-				return (this->_tree.allocator.max_size());
+				return (std::min(static_cast<size_type>(std::numeric_limits<difference_type>::max()), this->_allocator.max_size()));
 			};
 
 			ft::pair<iterator, bool>	insert(const value_type & val)
@@ -153,8 +154,11 @@ namespace ft
 			template <typename InpIter>
 			void	insert(InpIter first, InpIter last)
 			{
-				for (; first != last; first++)
+				while (first != last)
+				{
 					this->insert(*first);
+					++first;
+				}
 			};
 
 			void	erase(iterator position)
@@ -175,8 +179,14 @@ namespace ft
 
 			void	erase(iterator first, iterator last)
 			{
-				for (; first != last; first++)
+				iterator	buf = first;
+
+				while (first != last)
+				{
+					++buf;
 					this->erase(first);
+					first = buf;
+				}
 			};
 
 			void	swap(set & ref)
@@ -248,6 +258,50 @@ namespace ft
 			{
 				return (this->_tree.allocator);
 			};
+	};
+
+	template <typename T, class Compare, class Alloc>
+	void	swap(set<T, Compare, Alloc> & lhd, set<T, Compare, Alloc> & rhd)
+	{
+		lhd.swap(rhd);
+	};
+
+	template <typename T, class Compare, class Alloc>
+	bool	operator==(const set<T, Compare, Alloc> & lhd, const set<T, Compare, Alloc> & rhd)
+	{
+		if (lhd.size() != rhd.size())
+			return (false);
+		return (ft::equal(lhd.begin(), lhd.end(), rhd.begin()));
+	};
+
+	template <typename T, class Compare, class Alloc>
+	bool	operator!=(const set<T, Compare, Alloc> & lhd, const set<T, Compare, Alloc> & rhd)
+	{
+		return !(lhd == rhd);
+	};
+
+	template <typename T, class Compare, class Alloc>
+	bool	operator<(const set<T, Compare, Alloc> & lhd, const set<T, Compare, Alloc> & rhd)
+	{
+		return (ft::lexicographical_compare(lhd.begin(), lhd.end(), rhd.begin(), rhd.end()));
+	};
+
+	template <typename T, class Compare, class Alloc>
+	bool	operator>(const set<T, Compare, Alloc> & lhd, const set<T, Compare, Alloc> & rhd)
+	{
+		return (rhd < lhd);
+	};
+
+	template <typename T, class Compare, class Alloc>
+	bool	operator<=(const set<T, Compare, Alloc> & lhd, const set<T, Compare, Alloc> & rhd)
+	{
+		return !(rhd < lhd);
+	};
+
+	template <typename T, class Compare, class Alloc>
+	bool	operator>=(const set<T, Compare, Alloc> & lhd, const set<T, Compare, Alloc> & rhd)
+	{
+		return !(lhd < rhd);
 	};
 };
 

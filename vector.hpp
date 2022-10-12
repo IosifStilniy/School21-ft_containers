@@ -1,9 +1,11 @@
 #ifndef VECTOR_HPP
 # define VECTOR_HPP
 
+# include <algorithm>
 # include <memory>
 # include <stdexcept>
 # include <type_traits>
+# include <limits>
 # include "iterator_traits.hpp"
 # include "type_traits.hpp"
 # include "reverse_iterator.hpp"
@@ -57,7 +59,7 @@ namespace ft
 					_allocator.destroy(this->_values + i);
 				}
 				
-				if (this->_size)
+				if (this->_capacity)
 					_allocator.deallocate(this->_values, this->_capacity);
 
 				this->_values = new_values;
@@ -120,9 +122,9 @@ namespace ft
 			template <typename InpIter>
 			void	_assing_distributor(InpIter first, InpIter last, ft::false_type)
 			{
-				if (ft::is_same<std::input_iterator_tag,
-								typename ft::iterator_traits<InpIter>::iterator_category
-								>::value)
+				typedef typename	ft::is_same<std::input_iterator_tag,typename ft::iterator_traits<InpIter>::iterator_category>	_is_same;
+
+				if (_is_same::value)
 				{
 					this->clear();
 
@@ -162,10 +164,16 @@ namespace ft
 
 			void	_insert_by_n(iterator position, size_type n, const_reference val)
 			{
+				if (!n)
+					return ;
+
 				position = this->_insertion_routine(position, n);
 
 				while (n--)
-					*(position++) = val;
+				{
+					*position = val;
+					++position;
+				}
 			}
 
 			template <typename Integer>
@@ -177,10 +185,24 @@ namespace ft
 			template <typename InpIter>
 			void	_insertion_distributor(iterator position, InpIter first, InpIter last, ft::false_type)
 			{
+				typedef typename	ft::is_same<std::input_iterator_tag,typename ft::iterator_traits<InpIter>::iterator_category>	_is_same;
+
+				if (_is_same::value)
+				{
+					vector	buf(first, last);
+
+					this->_insertion_distributor(position, buf.begin(), buf.end(), ft::false_type());
+					return ;
+				}
+
 				position = this->_insertion_routine(position, std::distance(first, last));
 
-				while (first++ != last)
-					*(position++) = *first;
+				while (first != last)
+				{
+					*position = *first;
+					++first;
+					++position;
+				}
 			};
 
 		public:
@@ -308,16 +330,18 @@ namespace ft
 
 			size_type	max_size(void)	const
 			{
-				return (_allocator.max_size());
+				return (std::min(static_cast<size_type>(std::numeric_limits<difference_type>::max()), this->_allocator.max_size()));
 			};
 
 			void	resize(size_type n, value_type val = value_type())
 			{
-				if (n <= this->_size)
+				if (n == this->_size)
+					return ;
+
+				if (n < this->_size)
 				{
-					this->_size = n;
-					for (size_type i = this->_size; i < this->_capacity; i++)
-						_allocator.destroy(this->_values + i);
+					while (this->_size > n)
+						_allocator.destroy(this->_values + --this->_size);
 					return ;
 				}
 
@@ -435,12 +459,24 @@ namespace ft
 
 			void	insert(iterator position, size_type n, const_reference val)
 			{
-				this->_insert_by_n(position, n, val, ft::true_type());
+				if (!this->_size)
+				{
+					this->assign(n, val);
+					return ;
+				}
+
+				this->_insert_by_n(position, n, val);
 			};
 
 			template <typename InputIterator>
 			void	insert(iterator position, InputIterator first, InputIterator last)
 			{
+				if (!this->_size)
+				{
+					this->assign(first, last);
+					return ;
+				}
+
 				typedef typename	ft::is_integral<InputIterator>::type	_Integral;
 
 				this->_insertion_distributor(position, first, last, _Integral());
@@ -501,7 +537,7 @@ namespace ft
 	};
 
 	template <typename T, typename Alloc>
-	bool	operator==(vector<T, Alloc> & lhd, vector<T, Alloc> & rhd)
+	bool	operator==(const vector<T, Alloc> & lhd, const vector<T, Alloc> & rhd)
 	{
 		if (lhd.size() != rhd.size())
 			return (false);
@@ -509,36 +545,32 @@ namespace ft
 	};
 
 	template <typename T, typename Alloc>
-	bool	operator!=(vector<T, Alloc> & lhd, vector<T, Alloc> & rhd)
+	bool	operator!=(const vector<T, Alloc> & lhd, const vector<T, Alloc> & rhd)
 	{
 		return !(lhd == rhd);
 	};
 
 	template <typename T, typename Alloc>
-	bool	operator<(vector<T, Alloc> & lhd, vector<T, Alloc> & rhd)
+	bool	operator<(const vector<T, Alloc> & lhd, const vector<T, Alloc> & rhd)
 	{
 		return (ft::lexicographical_compare(lhd.begin(), lhd.end(), rhd.begin(), rhd.end()));
 	};
 
 	template <typename T, typename Alloc>
-	bool	operator>(vector<T, Alloc> & lhd, vector<T, Alloc> & rhd)
+	bool	operator>(const vector<T, Alloc> & lhd, const vector<T, Alloc> & rhd)
 	{
 		return (rhd < lhd);
 	};
 
 	template <typename T, typename Alloc>
-	bool	operator<=(vector<T, Alloc> & lhd, vector<T, Alloc> & rhd)
+	bool	operator<=(const vector<T, Alloc> & lhd, const vector<T, Alloc> & rhd)
 	{
-		if (lhd < rhd)
-			return (true);
 		return !(rhd < lhd);
 	};
 
 	template <typename T, typename Alloc>
-	bool	operator>=(vector<T, Alloc> & lhd, vector<T, Alloc> & rhd)
+	bool	operator>=(const vector<T, Alloc> & lhd, const vector<T, Alloc> & rhd)
 	{
-		if (rhd < lhd)
-			return (true);
 		return !(lhd < rhd);
 	};
 };

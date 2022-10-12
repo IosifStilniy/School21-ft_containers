@@ -13,12 +13,18 @@ namespace ft
 			first_type		first;
 			second_type		second;
 
-			pair(void) : first(first_type()), second(second_type()) {};
+			pair(void)
+				: first(), second()
+			{};
 
 			template <typename U, typename V>
-			pair(const pair<U, V> & src) : first(src.first), second(src.second) {};
+			pair(const pair<U, V> & src)
+				: first(src.first), second(src.second)
+			{};
 
-			pair(const first_type & first, const second_type & second) : first(first), second(second) {};
+			pair(first_type const & first, second_type const & second)
+				: first(first), second(second)
+			{};
 
 			~pair() {};
 
@@ -26,6 +32,7 @@ namespace ft
 			{
 				this->first = rhd.first;
 				this->second = rhd.second;
+				return (*this);
 			};
 
 			void	swap(pair & other)
@@ -80,7 +87,7 @@ namespace ft
 	};
 
 	template <typename T1, typename T2>
-	inline pair<T1, T2>	make_pair(T1 const & first, T2 const & second)
+	inline pair<T1, T2>	make_pair(T1 first, T2 second)
 	{
 		return (pair<T1, T2>(first, second));
 	};

@@ -63,12 +63,6 @@ namespace	ft
 	struct _is_integral_helper<char> : public true_type {};
 
 	template <>
-	struct _is_integral_helper<char16_t> : public true_type {};
-
-	template <>
-	struct _is_integral_helper<char32_t> : public true_type {};
-
-	template <>
 	struct _is_integral_helper<wchar_t> : public true_type {};
 
 	template <>

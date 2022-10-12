@@ -42,7 +42,7 @@ namespace ft
 			{};
 
 			RedBlackTree(const RedBlackTree & src)
-				: root(nullptr), allocator(src.allocator), comparator(src.comparator), size(0)
+				: root(nullptr), allocator(src.allocator), comparator(src.comparator), size(src.size)
 			{
 				this->_copy(src.root, &this->root);
 			};
@@ -72,7 +72,6 @@ namespace ft
 					return ;
 				}
 
-				this->size++;
 				*dst = this->allocator.allocate(1);
 				this->allocator.construct(*dst, *src);
 				(*dst)->parent = parent;
@@ -154,6 +153,7 @@ namespace ft
 					sibling->getOnSurface();
 					sibling->red = start->parent->red;
 					start->parent->red = false;
+					(*sibling->dirs[!start->getDir()])->red = false;
 				}
 				else if (sibling->red)
 				{
@@ -174,10 +174,7 @@ namespace ft
 				if (!start)
 				{
 					if (cur_height != ref_height)
-					{
-						std::cout << "cur: " << cur_height << " ref: " << ref_height << std::endl;
 						throw std::logic_error("number of black nodes volatile");
-					}
 
 					return ;
 				}
@@ -218,7 +215,8 @@ namespace ft
 			{
 				Node *	child = node->getChild();
 
-				*node->parent->dirs[node->getDir()] = child;
+				if (node->parent)
+					*node->parent->dirs[node->getDir()] = child;
 				if (child)
 				{
 					child->parent = node->parent;
@@ -357,7 +355,7 @@ namespace ft
 			{
 				Node *	founded = this->_findPlaceForInsert(key);
 
-				if (!founded
+				if (!founded || this->comparator(key, founded->value)
 					|| (!this->comparator(founded->value, key)
 						&& !this->comparator(key, founded->value)))
 					return (iterator(founded));
@@ -368,7 +366,7 @@ namespace ft
 			{
 				Node *	founded = this->_findPlaceForInsert(key);
 
-				if (!founded
+				if (!founded || this->comparator(key, founded->value)
 					|| (!this->comparator(founded->value, key)
 						&& !this->comparator(key, founded->value)))
 					return (const_iterator(founded));
@@ -389,7 +387,7 @@ namespace ft
 			{
 				const_iterator	it = this->lower_bound(key);
 
-				if (it != this->end()
+				if (it != this->cend()
 					&& !this->comparator(*it, key) && !this->comparator(key, *it))
 					return (++it);
 				return (it);
@@ -397,6 +395,9 @@ namespace ft
 
 			void	erase(Node * node)
 			{
+				if (!node)
+					return ;
+
 				if (node == this->root)
 				{
 					this->root = node->left;
@@ -476,15 +477,18 @@ namespace ft
 
 			const_reverse_iterator	crend(void)	const
 			{
-				return (const_reverse_iterator(this->begin()));
+				return (const_reverse_iterator(this->cbegin()));
 			};
 
-			void	swap(const RedBlackTree & ref)
+			void	swap(RedBlackTree & ref)
 			{
-				Node *	buf = this->root;
+				Node *		buf = this->root;
+				size_type	buf_size = this->size;
 
 				this->root = ref.root;
+				this->size = ref.size;
 				ref.root = buf;
+				ref.size = buf_size;
 			};
 	};
 }
