@@ -20,13 +20,13 @@ namespace ft
 			typedef	typename	_traits_type::pointer				pointer;
 
 		private:
-			pointer	_current;
+			pointer	m_current;
 
 		public:
 			vector_iterator(void) {};
 
 			vector_iterator(const vector_iterator & src)
-				: _current(src._current)
+				: m_current(src.m_current)
 			{};
 
 			template <typename Iter>
@@ -34,16 +34,16 @@ namespace ft
 													Iter,
 													typename ft::enable_if<ft::is_same<Iter, Pointer>::value, Pointer>::type
 													> & src)
-					: _current(src.base())
+					: m_current(src.base())
 			{};
 
-			vector_iterator(const pointer & src) : _current(src) {};
+			vector_iterator(const pointer & src) : m_current(src) {};
 
 			~vector_iterator() {};
 
 			vector_iterator &	operator=(const vector_iterator & rhd)
 			{
-				this->_current = rhd._current;
+				this->m_current = rhd.m_current;
 				return (*this);
 			};
 
@@ -53,72 +53,72 @@ namespace ft
 																typename ft::enable_if<ft::is_same<Iter, Pointer>::value, Pointer>::type
 													> & rhd)
 			{
-				this->_current = rhd.base();
+				this->m_current = rhd.base();
 				return (*this);
 			}
 
 			reference	operator*(void)	const
 			{
-				return (*_current);
+				return (*m_current);
 			};
 
 			pointer	operator->(void)	const
 			{
-				return (_current);
+				return (m_current);
 			};
 
 			reference	operator[](difference_type n)	const
 			{
-				return (this->_current[n]);
+				return (this->m_current[n]);
 			};
 
 			vector_iterator	operator+(difference_type n)	const
 			{
-				return (vector_iterator(this->_current + n));
+				return (vector_iterator(this->m_current + n));
 			};
 
 			vector_iterator &	operator+=(difference_type n)
 			{
-				this->_current += n;
+				this->m_current += n;
 				return (*this);
 			};
 
 			vector_iterator &	operator++(void)
 			{
-				this->_current++;
+				this->m_current++;
 				return (*this);
 			};
 
 			vector_iterator	operator++(int)
 			{
-				return (vector_iterator(this->_current++));
+				return (vector_iterator(this->m_current++));
 			};
 
 			vector_iterator	operator-(difference_type n)	const
 			{
-				return (vector_iterator(this->_current - n));
+				return (vector_iterator(this->m_current - n));
 			};
 
 			vector_iterator &	operator-=(difference_type n)
 			{
-				this->_current -= n;
+				this->m_current -= n;
 				return (*this);
 			};
 
 			vector_iterator &	operator--(void)
 			{
-				this->_current--;
+				this->m_current--;
 				return (*this);
 			};
 
 			vector_iterator	operator--(int)
 			{
-				return (vector_iterator(this->_current--));
+				return (vector_iterator(this->m_current--));
 			};
 
 			const pointer &	base(void)	const
 			{
-				return (this->_current);
+				return (this->m_current);
 			};
 	};
 

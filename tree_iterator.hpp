@@ -18,9 +18,11 @@ namespace ft
 
 			Node *	current;
 			Node *	root;
+			Node *	patch;
 
 		private:
-			void	_go(bool forward)
+
+			void	_M_go(bool forward)
 			{
 				if (*this->current->dirs[forward])
 				{
@@ -32,32 +34,31 @@ namespace ft
 					return ;
 				}
 
-				while (this->current->getDir() == forward)
+				while (this->current->get_dir() == forward)
 					this->current = this->current->parent;
 				this->current = this->current->parent;
 			};
 
-
-			tree_iterator(Node * node, Node *root) : current(node), root(root) {};
+			tree_iterator(Node * node, Node * root, Node * patch) : current(node), root(root), patch(patch) {};
 
 		public:
 			tree_iterator(void) {};
 
-			tree_iterator(Node * node) : current(node)
+			tree_iterator(Node * node, Node * patch) : current(node), root(), patch(patch)
 			{
 				while (node && node->parent)
 					node = node->parent;
 				this->root = node;
 			};
 
-			tree_iterator(const tree_iterator & it) : current(it.current), root(it.root) {};
+			tree_iterator(const tree_iterator & it) : current(it.current), root(it.root), patch(it.patch) {};
 
 			template <typename _T>
 			tree_iterator(const tree_iterator<
 												_T,
 												typename ft::enable_if<(ft::is_same<const _T, T>::value), Node>::type
 												> & it)
-				: current(it.current), root(it.root)
+				: current(it.current), root(it.root), patch(it.patch)
 			{};
 
 			~tree_iterator() {};
@@ -84,11 +85,15 @@ namespace ft
 
 			reference	operator*(void)	const
 			{
+				if (!this->current)
+					return (this->patch->value);
 				return (this->current->value);
 			};
 
 			pointer	operator->(void)	const
 			{
+				if (!this->current)
+					return (&this->patch->value);
 				return (&this->current->value);
 			};
 
@@ -106,7 +111,7 @@ namespace ft
 					return (*this);
 				}
 
-				this->_go(true);
+				this->_M_go(true);
 
 				return (*this);
 			};
@@ -116,7 +121,7 @@ namespace ft
 				if (!this->root)
 					return (*this);
 
-				tree_iterator	it = tree_iterator(this->current);
+				tree_iterator	it = tree_iterator(this->current, this->patch);
 
 				if (!this->current)
 				{
@@ -128,7 +133,7 @@ namespace ft
 					return (*this);
 				}
 
-				this->_go(true);
+				this->_M_go(true);
 
 				return (it);
 			};
@@ -147,7 +152,7 @@ namespace ft
 					return (*this);
 				}
 
-				this->_go(false);
+				this->_M_go(false);
 
 				return (*this);
 			};
@@ -157,7 +162,7 @@ namespace ft
 				if (!this->root)
 					return (*this);
 				
-				tree_iterator	it = tree_iterator(this->current);
+				tree_iterator	it = tree_iterator(this->current, this->patch);
 
 				if (!this->current)
 				{
@@ -168,7 +173,7 @@ namespace ft
 					return (*this);
 				}
 
-				this->_go(false);
+				this->_M_go(false);
 
 				return (it);
 			};

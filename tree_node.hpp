@@ -1,33 +1,34 @@
-#ifndef TREE_NODE
-# define TREE_NODE
+#ifndef TREE_NODE_HPP
+# define TREE_NODE_HPP
 
 # include <stdexcept>
 
 namespace ft
 {
 	template <typename T>
-	class TreeNode
+	class tree_node
 	{
 		public:
+			typedef T	value_type;
 
 			T				value;
 			bool			red;
-			TreeNode	*	left;
-			TreeNode	*	right;
-			TreeNode	*	parent;
-			TreeNode	**	dirs[2];
+			tree_node	*	left;
+			tree_node	*	right;
+			tree_node	*	parent;
+			tree_node	**	dirs[2];
 
-			TreeNode(void)
+			tree_node(void)
 				: value(), red(false), left(nullptr), right(nullptr), parent(nullptr)
 			{
 				this->dirs[0] = &this->left;
 				this->dirs[1] = &this->right;
 			};
 
-			TreeNode(const T & value, TreeNode * parent, const bool red = true)
+			tree_node(const T & value, tree_node * parent, const bool red = true)
 				: value(value)
 			{
-				*this = TreeNode();
+				*this = tree_node();
 				this->parent = parent;
 				this->red = red;
 
@@ -35,7 +36,7 @@ namespace ft
 				this->dirs[1] = &this->right;
 			};
 
-			TreeNode(const TreeNode & src)
+			tree_node(const tree_node & src)
 				: value(src.value)
 			{
 				*this = src;
@@ -44,9 +45,9 @@ namespace ft
 				this->dirs[1] = &this->right;
 			};
 
-			~TreeNode() {};
+			~tree_node() {};
 
-			TreeNode &	operator=(TreeNode const & rhd)
+			tree_node &	operator=(tree_node const & rhd)
 			{
 				this->red = rhd.red;
 				this->left = rhd.left;
@@ -56,15 +57,15 @@ namespace ft
 				return (*this);
 			};
 
-			TreeNode *	getUncle(void)	const
+			tree_node *	get_uncle(void)	const
 			{
 				if (!this->parent || !this->parent->parent)
 					return (nullptr);
 				
-				return (*this->parent->parent->dirs[!this->parent->getDir()]);
+				return (*this->parent->parent->dirs[!this->parent->get_dir()]);
 			};
 			
-			bool	isOuterGrandchild(void)	const
+			bool	is_outer_grandchild(void)	const
 			{
 				if (!this->parent || !this->parent->parent)
 					throw std::range_error("node have no ancestors");
@@ -76,7 +77,7 @@ namespace ft
 				return (false);
 			};
 
-			int	getDir(void)	const
+			int	get_dir(void)	const
 			{
 				if (!this->parent)
 					return (-1);
@@ -86,12 +87,12 @@ namespace ft
 				return (1);
 			};
 
-			void	getOnSurface(void)
+			void	get_on_surface(void)
 			{
 				if (!this->parent)
 					throw std::range_error("node have no parent");
 
-				int		i = this->getDir();
+				int		i = this->get_dir();
 
 				*this->parent->dirs[i] = *this->dirs[!i];
 				if (*this->dirs[!i])
@@ -109,7 +110,7 @@ namespace ft
 				*this->parent->dirs[i] = this;
 			};
 
-			void	stealLinks(const TreeNode & src)
+			void	steal_links(const tree_node & src)
 			{
 				this->parent = src.parent;
 				this->left = src.left;
@@ -121,30 +122,30 @@ namespace ft
 				if (this->right)
 					this->right->parent = this;
 				if (this->parent)
-					*this->parent->dirs[src.getDir()] = this;
+					*this->parent->dirs[src.get_dir()] = this;
 			};
 
-			void	stealLinks(const TreeNode * src)
+			void	steal_links(const tree_node * src)
 			{
-				this->stealLinks(*src);
+				this->steal_links(*src);
 			};
 
-			TreeNode *	getChild(void)	const
+			tree_node *	get_child(void)	const
 			{
 				if (this->left)
 					return (this->left);
 				return (this->right);
 			};
 
-			TreeNode *	getSibling(void)	const
+			tree_node *	get_sibling(void)	const
 			{
 				if (!this->parent)
 					throw std::range_error("node dosn't have a parent and have no siblings");
 				
-				return (*this->parent->dirs[!this->getDir()]);
+				return (*this->parent->dirs[!this->get_dir()]);
 			};
 
-			bool	allChildrensBlack(void)	const
+			bool	all_childrens_black(void)	const
 			{
 				return ((!this->left || !this->left->red) && (!this->right || !this->right->red));
 			};
