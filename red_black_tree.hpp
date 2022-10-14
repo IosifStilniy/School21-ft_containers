@@ -98,7 +98,7 @@ namespace ft
 					this->m_root = this->m_root->parent;				
 			};
 
-			static void	_M_insertion_rebalance(node * start)
+			static void	_insertion_rebalance(node * start)
 			{
 				node *	uncle = start->get_uncle();
 
@@ -129,11 +129,11 @@ namespace ft
 					start->parent->red = false;
 					uncle->red = false;
 					start->parent->parent->red = true;
-					_M_insertion_rebalance(start->parent->parent);
+					_insertion_rebalance(start->parent->parent);
 				}
 			};
 
-			static void	_M_deletion_rebalance(node * start)
+			static void	_deletion_rebalance(node * start)
 			{
 				if (!start->parent)
 					return ;
@@ -145,7 +145,7 @@ namespace ft
 					sibling->red = true;
 
 					if (!start->parent->red)
-						_M_deletion_rebalance(start->parent);
+						_deletion_rebalance(start->parent);
 					else
 						start->parent->red = false;
 				}
@@ -170,7 +170,7 @@ namespace ft
 					sibling->get_on_surface();
 					sibling->red = false;
 					start->parent->red = true;
-					_M_deletion_rebalance(start);
+					_deletion_rebalance(start);
 				}
 			};
 
@@ -300,7 +300,7 @@ namespace ft
 				return (crsr);
 			};
 
-			static void	_M_print_value(node * _node, std::string before = std::string(""), std::string after = std::string(""))
+			static void	_print_value(node * _node, std::string before = std::string(""), std::string after = std::string(""))
 			{
 				if (before.size())
 					std::cout << before;
@@ -334,7 +334,7 @@ namespace ft
 
 				node *	inserted = *insertion_side;
 
-				_M_insertion_rebalance(inserted);
+				_insertion_rebalance(inserted);
 				this->_M_update_root();
 				// this->_M_check_tree();
 
@@ -422,7 +422,7 @@ namespace ft
 				node *	child = _node->get_child();
 
 				if (!_node->red && !child)
-					_M_deletion_rebalance(_node);
+					_deletion_rebalance(_node);
 				
 				this->_M_delete_node(_node);
 				this->_M_update_root();

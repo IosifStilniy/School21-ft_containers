@@ -62,28 +62,28 @@ namespace ft
 			};
 
 		private:
-			typedef				red_black_tree <value_type, value_compare, allocator_type>	Tree;
+			typedef				red_black_tree <value_type, value_compare, allocator_type>	tree;
 
 		public:
-			typedef typename	Tree::iterator												iterator;
-			typedef typename	Tree::const_iterator										const_iterator;
-			typedef typename	Tree::reverse_iterator										reverse_iterator;
-			typedef typename	Tree::const_reverse_iterator								const_reverse_iterator;
+			typedef typename	tree::iterator												iterator;
+			typedef typename	tree::const_iterator										const_iterator;
+			typedef typename	tree::reverse_iterator										reverse_iterator;
+			typedef typename	tree::const_reverse_iterator								const_reverse_iterator;
 			typedef typename	ft::iterator_traits<iterator>::difference_type				difference_type;
 
 		private:
 			key_compare		m_comparator;
-			Tree			m_tree;
+			tree			m_tree;
 
 		public:
 
 			explicit map(const key_compare & comp = key_compare(), const allocator_type & alloc = allocator_type())
-				: m_comparator(key_compare(comp)), m_tree(Tree(alloc, this->m_comparator))
+				: m_comparator(key_compare(comp)), m_tree(tree(alloc, this->m_comparator))
 			{};
 
 			template <typename InputIter>
 			map(InputIter first, InputIter last, const key_compare & comp = key_compare(), const allocator_type & alloc = allocator_type())
-				:	m_comparator(key_compare(comp)), m_tree(Tree(alloc, this->m_comparator))
+				:	m_comparator(key_compare(comp)), m_tree(tree(alloc, this->m_comparator))
 			{
 				this->insert(first, last);
 			};
