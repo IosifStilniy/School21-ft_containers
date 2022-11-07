@@ -95,7 +95,7 @@ namespace ft
 				return (position);
 			}
 
-			void	_M_assing_by_n(size_type n, const_reference val)
+			void	_M_assign_by_n(size_type n, const_reference val)
 			{
 				this->reserve(n);
 
@@ -120,7 +120,7 @@ namespace ft
 			template <typename Integer>
 			void	_M_assing_distributor(Integer n, Integer val, ft::true_type)
 			{
-				this->_M_assing_by_n(n, val);
+				this->_M_assign_by_n(n, val);
 			}
 
 			template <typename InpIter>
@@ -435,7 +435,7 @@ namespace ft
 
 			void	assign(size_type n, const_reference val)
 			{
-				this->_M_assing_by_n(n, val);
+				this->_M_assign_by_n(n, val);
 			};
 
 			void	push_back(const_reference val)
